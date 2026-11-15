@@ -1534,18 +1534,11 @@
 .mt-user{position:relative;flex:none;display:flex;align-items:center;margin-left:6px;opacity:0;animation:navStaggerIn .38s ease-out forwards;animation-delay:.4s}
 @media (prefers-reduced-motion:reduce){
   .mt-user{animation:none !important;opacity:1 !important}
-  .mt-mask{transition:none !important}
-  .mt-mask .mt-modal{transition:none !important}
-  .mt-avatar-wrap{animation:none !important}
+  .mt-mask.open .mt-modal{transition:none !important}
 }
 .mt-login-btn{font-family:inherit;font-size:13px;font-weight:600;letter-spacing:1px;color:#fff;background:var(--min-black);border:0;border-radius:999px;padding:9px 16px;cursor:pointer;transition:background .18s ease}
 .mt-login-btn:hover{background:var(--min-dark)}
-/* 头像：登录后从 display:none 变 block 时补一次淡入（动画挂在真正出现的元素上才会重播） */
-.mt-avatar-wrap{display:none;position:relative;animation:mtAvatarIn .36s cubic-bezier(.22,1,.36,1) both}
-@keyframes mtAvatarIn{
-  from{opacity:0;transform:translateY(-6px) scale(.9)}
-  to{opacity:1;transform:translateY(0) scale(1)}
-}
+.mt-avatar-wrap{display:none;position:relative}
 .mt-avatar-btn{border:0;background:transparent;cursor:pointer;padding:3px;border-radius:999px;display:block;line-height:0}
 .mt-avatar-btn:hover{background:var(--min-tag)}
 .mt-avatar{width:32px;height:32px;border-radius:50%;background:var(--min-black);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:600;letter-spacing:0}
@@ -1561,28 +1554,9 @@
 .mt-dd-item:hover{background:var(--min-tag)}
 .mt-dd-out{color:var(--accent-red)}
 
-/* 遮罩：始终 display:flex，靠 opacity + visibility 过渡，才能既有淡入也有淡出
-   （display:none ↔ flex 的瞬切会让 transition 失效，表现为直接闪现/消失） */
-.mt-mask{
-  position:fixed;inset:0;z-index:95;padding:24px;
-  background:rgba(20,20,20,.30);
-  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .26s var(--modal-ease), visibility 0s linear .26s;
-}
-.mt-mask.open{
-  opacity:1;visibility:visible;pointer-events:auto;
-  transition:opacity .26s var(--modal-ease), visibility 0s linear 0s;
-}
-.mt-modal{
-  width:100%;max-width:480px;background:#fff;
-  border:1px solid var(--min-line);border-radius:16px;
-  padding:44px 40px;box-shadow:0 24px 70px rgba(0,0,0,.16);
-  max-height:calc(100vh - 48px);overflow:auto;
-  transform:translateY(12px) scale(.98);opacity:0;
-  transition:transform .26s var(--modal-ease), opacity .26s var(--modal-ease);
-}
+.mt-mask{position:fixed;inset:0;z-index:95;background:rgba(20,20,20,.30);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:24px}
+.mt-mask.open{display:flex}
+.mt-modal{width:100%;max-width:480px;background:#fff;border:1px solid var(--min-line);border-radius:16px;padding:44px 40px;box-shadow:0 24px 70px rgba(0,0,0,.16);max-height:calc(100vh - 48px);overflow:auto;transform:translateY(12px) scale(.98);opacity:0;transition:transform .26s var(--modal-ease),opacity .26s var(--modal-ease)}
 .mt-mask.open .mt-modal{transform:translateY(0) scale(1);opacity:1}
 .mt-brand{display:flex;align-items:center;gap:11px;margin-bottom:34px}
 .mt-brand .mt-lm{width:13px;height:13px;background:var(--min-black);flex:none}
@@ -1600,33 +1574,8 @@
 .mt-input input{display:block;width:100%;border:0;outline:0;padding:14px 16px;font-size:15px;font-family:inherit;background:transparent;color:var(--min-black)}
 .mt-input input::placeholder{color:var(--min-light)}
 .mt-input input[readonly]{color:var(--min-gray)}
-.mt-err{
-  font-size:12px;color:var(--accent-red);line-height:1.5;
-  display:none;margin-top:10px;
-}
-.mt-err.on{
-  display:flex;align-items:flex-start;gap:7px;
-  background:rgba(217,43,30,.055);
-  border:1px solid rgba(217,43,30,.22);
-  border-radius:8px;padding:9px 11px;
-  animation:mtErrIn .22s ease-out;
-}
-.mt-err.on::before{
-  content:"";flex:none;width:5px;height:5px;border-radius:50%;
-  background:var(--accent-red);margin-top:6px;
-}
-@keyframes mtErrIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
-/* 记住密码 */
-.mt-remember{
-  display:flex;align-items:center;gap:8px;
-  margin:-4px 0 20px;font-size:13px;color:var(--min-gray);
-  cursor:pointer;user-select:none;width:max-content;
-}
-.mt-remember input{
-  width:16px;height:16px;margin:0;flex:none;
-  accent-color:var(--min-black);cursor:pointer;
-}
-.mt-remember:hover{color:var(--min-dark)}
+.mt-err{font-size:12px;color:var(--accent-red);margin-top:7px;display:none;line-height:1.5}
+.mt-err.on{display:block}
 .mt-btn{width:100%;margin-top:6px;padding:15px;border:0;border-radius:999px;background:var(--min-black);color:#fff;font-size:15px;font-weight:600;letter-spacing:1.5px;cursor:pointer;font-family:inherit;transition:background .18s ease,transform .18s ease}
 .mt-btn:hover{background:var(--min-dark)}
 .mt-btn:active{transform:translateY(1px)}
@@ -2486,17 +2435,14 @@ function mtCloudPush(key){
     </div>
 
     <div class="log-item">
-      <div class="log-date"><b>11/17</b>2026</div>
+      <div class="log-date"><b>11/15</b>2026</div>
       <div class="log-rail" aria-hidden="true"></div>
       <div class="log-body">
-        <h3>离线部署与登录体验重构<span class="log-tag">工程优化</span></h3>
+        <h3>离线部署与样式重构<span class="log-tag">工程优化</span></h3>
         <ul>
-          <li>去掉全部外部依赖：xlsx 改为本地「vendor/xlsx.full.min.js」，exceljs 改为导出时按需加载「vendor/exceljs.min.js」，断网、纯内网环境同样能导入导出 Excel；在线字体与预连接一并移除，改用系统字体栈。</li>
-          <li>快递月结整段样式去重：删除重复的整套按钮 / 表格 / 弹窗 / 容器 / 动画定义，通用组件统一复用全局样式，只保留该模块真正独有的规则；后续改全局样式不用再改两处，样式体积同步变小。</li>
-          <li>首页白底版式不再依赖 CSS「:has()」，改由路由给 body / .site-body 切换「is-home」类名，老内核浏览器也不会错版。</li>
-          <li>修复登录弹窗动画：遮罩改为常驻 display 并靠 opacity + visibility 过渡，淡入、淡出都能正常播放（原来 display 瞬切导致关闭时直接消失）；右上角头像在登录成功后补回淡入缩放动画。</li>
-          <li>登录弹窗新增「记住密码」：登录成功后按勾选状态保存邮箱与密码，下次打开自动回填并勾选，取消勾选立即清除本地记录；密码仅做编码遮挡，不落明文，共用电脑建议不勾选。</li>
-          <li>登录报错补齐提示：邮箱为空、邮箱格式不对、密码为空分别给出对应文字提示，服务端错误统一翻译为「邮箱或密码不正确 / 该邮箱尚未确认 / 尝试过于频繁 / 网络异常」，提示条改为浅红底样式，密码错误时同步标红输入框。</li>
+          <li>去掉全部外部依赖：xlsx 改为本地 「vendor/xlsx.full.min.js」，exceljs 改为导出时按需加载 「vendor/exceljs.min.js」，断网、纯内网环境同样能导入导出 Excel；在线字体与预连接一并移除，改用系统字体栈。</li>
+          <li>快递月结整段样式去重：删除重复的整套按钮 / 表格 / 弹窗 / 容器 / 动画定义，通用组件统一复用全局样式，只保留该模块真正独有的规则，样式体积明显变小，后续改全局样式不再需要改两处。</li>
+          <li>首页白底版式不再依赖 CSS 「:has()」，改由路由给 body / .site-body 切换 「is-home」 类名，老内核浏览器也不会错版。</li>
           <li>补全页面描述 meta，其余布局、交互与业务流程与上一版保持一致（已逐屏比对确认）。</li>
         </ul>
       </div>
@@ -6431,10 +6377,6 @@ window.EXPRESS = {
       <label>密码</label>
       <div class="mt-input" id="mtPwdBox"><input id="mtPassword" type="password" placeholder="输入登录密码" autocomplete="current-password"></div>
     </div>
-    <label class="mt-remember">
-      <input type="checkbox" id="mtRemember">
-      <span>记住密码</span>
-    </label>
     <div class="mt-err" id="mtLoginErr"></div>
     <button type="button" class="mt-btn" id="mtLoginSubmit">登录</button>
     <div class="mt-cancel" id="mtLoginClose">关闭</div>
@@ -6524,56 +6466,10 @@ window.EXPRESS = {
   $("mtNick").addEventListener("input", function(){ $("mtNickBox").classList.remove("bad"); err($("mtNickErr"), ""); });
   $("mtOldPwd").addEventListener("input", function(){ $("mtOldBox").classList.remove("bad"); err($("mtOldErr"), ""); });
 
-  /* ---------- 记住密码 ---------- */
-  var REM_KEY = "mt_remember_v1";
-  var remBox = $("mtRemember");
-  function remSave(email, pwd){
-    try{
-      localStorage.setItem(REM_KEY, JSON.stringify({
-        e: email,
-        p: btoa(encodeURIComponent(pwd))
-      }));
-    }catch(e2){}
-  }
-  function remClear(){
-    try{ localStorage.removeItem(REM_KEY); }catch(e2){}
-  }
-  function remLoad(){
-    var raw = null;
-    try{ raw = localStorage.getItem(REM_KEY); }catch(e2){}
-    if (!raw){ remBox.checked = false; return; }
-    var o = null;
-    try{ o = JSON.parse(raw); }catch(e2){ o = null; }
-    if (!o || !o.e){ remClear(); remBox.checked = false; return; }
-    var pwd = "";
-    try{ pwd = decodeURIComponent(atob(o.p || "")); }catch(e2){ pwd = ""; }
-    $("mtEmail").value = o.e;
-    $("mtPassword").value = pwd;
-    remBox.checked = true;
-  }
-  remBox.addEventListener("change", function(){
-    if (!remBox.checked){
-      remClear();
-      return;
-    }
-    /* 勾上时若已有内容，立刻存一份 */
-    var e0 = $("mtEmail").value.trim(), p0 = $("mtPassword").value.trim();
-    if (e0 && p0) remSave(e0, p0);
-  });
-
   $("mtLoginTrigger").onclick = function(){
     err(loginErr, "");
-    $("mtEmailBox").classList.remove("bad");
-    $("mtPwdBox").classList.remove("bad");
-    remLoad();
     openMask(maskLogin);
-    setTimeout(function(){
-      try{
-        /* 已记住密码时直接聚焦登录按钮，避免覆盖已填内容 */
-        if (remBox.checked) $("mtLoginSubmit").focus();
-        else $("mtEmail").focus();
-      }catch(e){}
-    }, 220);
+    setTimeout(function(){ try{ $("mtEmail").focus(); }catch(e){} }, 220);
   };
 
   /* ---------- 头像 ---------- */
@@ -6602,19 +6498,8 @@ window.EXPRESS = {
     var email = $("mtEmail").value.trim();
     var pwd = $("mtPassword").value.trim();
     var bad = false;
-    /* 逐项给文字提示，不再只抖动输入框 */
-    if (!email){
-      $("mtEmailBox").classList.add("bad"); bad = true;
-      err(loginErr, "请输入登录邮箱");
-    } else if (email.indexOf("@") < 0 || email.length < 5){
-      $("mtEmailBox").classList.add("bad"); bad = true;
-      err(loginErr, "邮箱格式不正确，请检查后重试");
-    }
-    if (!pwd){
-      $("mtPwdBox").classList.add("bad"); bad = true;
-      if (!email) err(loginErr, "请输入邮箱和密码");
-      else if (email.indexOf("@") >= 0) err(loginErr, "请输入登录密码");
-    }
+    if (email.indexOf("@") < 0){ $("mtEmailBox").classList.add("bad"); bad = true; }
+    if (!pwd){ $("mtPwdBox").classList.add("bad"); bad = true; }
     if (bad) return;
     if (!mtClient){ err(loginErr, "云端组件未就绪，请刷新页面重试"); return; }
 
@@ -6626,12 +6511,9 @@ window.EXPRESS = {
       busy = false;
       btn.disabled = false; btn.textContent = "登录";
       if (res.error){
-        $("mtPwdBox").classList.add("bad");
         err(loginErr, friendly(res.error.message));
         return;
       }
-      /* 登录成功：按勾选状态保存 / 清除凭据 */
-      if (remBox.checked) remSave(email, pwd); else remClear();
       $("mtPassword").value = "";
       closeMask(maskLogin);
     }).catch(function(e){
