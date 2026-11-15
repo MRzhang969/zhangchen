@@ -1,0 +1,14 @@
+﻿name: Supabase Keepalive
+on:
+  schedule:
+    # UTC 时间，对应北京时间大约每周三晚上
+    - cron: '0 10 * * 3'
+  workflow_dispatch: # 支持手动点按钮触发测试
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping site
+        run: curl -s "https://mrzhang969.github.io/zhangchen/" || true
+
