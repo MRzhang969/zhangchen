@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>巡查台账</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fafafa'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23111111'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://miaoda.feishu.cn">
-<link rel="preconnect" href="https://sf3-scmcdn-cn.feishucdn.com" crossorigin>
-<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600&amp;display=swap">
+<meta name="description" content="MINI TOOLKIT · 巡查台账 / 快递月结，纯前端离线可用工具">
+<meta name="theme-color" content="#111111">
+<!-- 离线部署：不引用任何外部 CDN / 字体服务，全部使用系统字体栈 -->
 <style>
     /* ========== 原版 Minimalism Design Token（未改动） ========== */
     :root {
@@ -1168,465 +1168,290 @@
     .tool-tab{padding:8px 14px;font-size:12px;letter-spacing:1px;}
 }
 
-/* ===== 快递月结：整段作用域限定在 #tool-express 内 ===== */
-#tool-express *{
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Microsoft Yahei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
-    }
-#tool-express{animation:bodyIn 0.5s ease-out;}
-@keyframes bodyIn{
-        from { opacity:0; transform: translateY(6px); }
-        to { opacity:1; transform: translateY(0); }
-    }
-#tool-express .container{
-        max-width: 1280px;
-        margin:0 auto;
-        background: var(--min-white);
-        border:1px solid var(--min-line);
-        border-radius: var(--min-radius);
-        box-shadow: var(--shadow-1);
-        padding:36px;
-        animation: cardIn 0.5s ease-out;
-    }
-@keyframes cardIn{
-        from { opacity:0; transform: translateY(10px); }
-        to { opacity:1; transform: translateY(0); }
-    }
-#tool-express .header{
-        display:flex;
-        align-items: baseline;
-        justify-content: space-between;
-        border-bottom:1px solid var(--min-line);
-        padding-bottom:16px;
-        margin-bottom:18px;
-    }
-#tool-express .header-left{
-        display:flex;
-        align-items:center;
-        gap:14px;
-    }
-#tool-express .logo-mark{
-        width:14px;height:14px;
-        background:var(--min-black);
-        border:none;
-        border-radius:50%;
-    }
-#tool-express .sub-header-line{
-        display:flex;
-        align-items:center;
-        gap:14px;
-        font-size:12px;
-        font-weight:700;
-        margin-bottom:16px;
-        letter-spacing:2px;
-        color:var(--min-gray);
-    }
-#tool-express .yellow-mark{
-        width:14px;height:14px;
-        background:var(--min-tag);
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-    }
-#tool-express h2{
-        font-size:20px;
-        font-weight:700;
-        letter-spacing:3px;
-        color:var(--min-black);
-    }
-#tool-express .tip{
-        font-size:11px;
-        color:var(--min-gray);
-        background:var(--min-tag);
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        padding:5px 10px;
-        letter-spacing:1px;
-    }
-#tool-express .last-file-tip{
-        background:var(--min-white);
-        color:var(--min-dark);
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        padding:12px 14px;
-        font-size:13px;
-        margin-bottom:18px;
-        display:flex;
-        align-items:center;
-        gap:10px;
-        box-shadow:var(--shadow-1);
-        animation:slideIn 0.45s ease-out;
-    }
-@keyframes slideIn{
-        from { opacity:0; transform: translateX(-8px); }
-        to { opacity:1; transform: translateX(0); }
-    }
-#tool-express .dot-red{
-        width:8px;height:8px;
-        background:var(--min-black);
-        border:none;
-        border-radius:50%;
-    }
-#tool-express .btn-group{
-        margin:20px 0;
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-    }
+/* ===== 快递月结：作用域限定在 #tool-express 内 =====
+   重构说明：通用组件（header / 按钮配色 / 表格 / 弹窗 / tag / cfg-block / 动效）一律复用全局样式，
+   这里只保留「快递月结」真正独有、或与全局存在差异的部分，避免一套样式维护两份。
+   基按钮 #tool-express button 保留，是为维持模块内小按钮（btn-mini / op-btn / search-clear）的既有视觉结果。 */
 #tool-express button{
-        padding:10px 18px;
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        background:var(--min-white);
-        color:var(--min-dark);
-        font-size:13px;
-        font-weight:600;
-        letter-spacing:2px;
-        cursor:pointer;
-        box-shadow:var(--shadow-1);
-        transition:all 0.15s ease;
-        position:relative;
-    }
+    padding:10px 18px;
+    border:1px solid var(--min-line);
+    border-radius:var(--min-radius);
+    background:var(--min-white);
+    color:var(--min-dark);
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:2px;
+    cursor:pointer;
+    box-shadow:var(--shadow-1);
+    transition:all .15s ease;
+    position:relative;
+}
 #tool-express button:hover{
-        background:var(--min-black);
-        color:var(--min-white);
-        border-color:var(--min-black);
-        box-shadow:var(--shadow-2);
-    }
-#tool-express button:active{
-        transform:translateY(1px);
-        box-shadow:var(--shadow-1);
-    }
-#tool-express button.primary{
-        background:var(--min-black);
-        color:var(--min-white);
-        border-color:var(--min-black);
-    }
-#tool-express button.primary:hover{
-        background:var(--min-dark);
-        border-color:var(--min-dark);
-    }
-#tool-express button.success{
-        background:var(--min-dark);
-        color:var(--min-white);
-        border-color:var(--min-dark);
-    }
-#tool-express button.success:hover{
-        background:var(--min-black);
-        border-color:var(--min-black);
-    }
-#tool-express button.warning{
-        background:var(--min-white);
-        color:var(--min-dark);
-        border-color:var(--min-line);
-    }
-#tool-express button.warning:hover{
-        background:var(--min-tag);
-        color:var(--min-black);
-    }
-#tool-express button.danger{
-        background:var(--min-white);
-        color:var(--min-dark);
-        border-color:var(--min-line);
-    }
-#tool-express button.danger:hover{
-        background:var(--min-black);
-        color:var(--min-white);
-        border-color:var(--min-black);
-    }
-#tool-express button.info{
-        background:var(--min-white);
-        color:var(--min-dark);
-        border-color:var(--min-line);
-    }
-#tool-express button.info:hover{
-        background:var(--min-tag);
-        color:var(--min-black);
-    }
-#tool-express button.btn-mini{
-        padding:7px 12px;
-        font-size:12px;
-        letter-spacing:1px;
-    }
-#tool-express input[type="file"]{ display:none; }
-#tool-express .search-area{
-        margin:16px 0;
-        display:flex;
-        gap:10px;
-        align-items:center;
-        flex-wrap:wrap;
-    }
-#tool-express input[type="text"], #tool-express input[type="number"], #tool-express select{
-        height:44px;
-        box-sizing:border-box;
-        padding:0 12px;
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        background:var(--min-white);
-        font-size:14px;
-        outline:none;
-        box-shadow:var(--shadow-1);
-        transition:box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-#tool-express input:focus, #tool-express select:focus{
-        box-shadow:var(--shadow-2);
-        border-color:var(--min-dark);
-    }
-#tool-express table{
-        width:100%;
-        border-collapse:collapse;
-        margin-top:20px;
-        font-size:14px;
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        overflow:hidden;
-        box-shadow:var(--shadow-1);
-        animation:tableIn 0.5s ease-out;
-    }
-@keyframes tableIn{
-        from { opacity:0; transform: translateY(8px); }
-        to { opacity:1; transform: translateY(0); }
-    }
-#tool-express th, #tool-express td{
-        padding:12px 14px;
-        text-align:center;
-        border-bottom:1px solid var(--min-line);
-        border-right:1px solid var(--min-line);
-    }
-#tool-express th{
-        background:var(--min-tag);
-        color:var(--min-black);
-        font-weight:700;
-        letter-spacing:2px;
-    }
-#tool-express td.left{ text-align:left; }
-#tool-express tbody tr{ transition:background 0.18s ease; }
-#tool-express tbody tr:nth-child(even){ background:#fbfbfb; }
-#tool-express tbody tr:hover{ background:var(--min-tag); }
-#tool-express tbody tr:last-child td{ border-bottom:none; }
-#tool-express .stat-wrap{
-        display:flex;
-        gap:12px;
-        flex-wrap:wrap;
-        margin:14px 0;
-    }
+    background:var(--min-black);color:var(--min-white);
+    border-color:var(--min-black);box-shadow:var(--shadow-2);
+}
+#tool-express button:active{transform:translateY(1px);box-shadow:var(--shadow-1);}
+#tool-express button.btn-mini{padding:7px 12px;font-size:12px;letter-spacing:1px;}
+/* 配色变体：必须保留。上面的 #tool-express button 是「ID + 元素」选择器，权重高于全局 button.primary，
+   若不在此声明，主按钮会被基按钮的白底样式盖掉。 */
+#tool-express button.primary{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
+#tool-express button.primary:hover{background:var(--min-dark);border-color:var(--min-dark);}
+#tool-express button.success{background:var(--min-dark);color:var(--min-white);border-color:var(--min-dark);}
+#tool-express button.success:hover{background:var(--min-black);border-color:var(--min-black);}
+#tool-express button.warning{background:var(--min-white);color:var(--min-dark);border-color:var(--min-line);}
+#tool-express button.warning:hover{background:var(--min-tag);color:var(--min-black);}
+#tool-express button.danger{background:var(--min-white);color:var(--min-dark);border-color:var(--min-line);}
+#tool-express button.danger:hover{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
+#tool-express button.info{background:var(--min-white);color:var(--min-dark);border-color:var(--min-line);}
+#tool-express button.info:hover{background:var(--min-tag);color:var(--min-black);}
+
+/* 表单控件：模块内统一 44px 高（全局为内容撑开，此处是差异样式） */
+#tool-express input[type="file"]{display:none;}
+#tool-express input[type="text"],
+#tool-express input[type="number"],
+#tool-express select{
+    height:44px;box-sizing:border-box;padding:0 12px;
+    border:1px solid var(--min-line);border-radius:var(--min-radius);
+    background:var(--min-white);font-size:14px;outline:none;
+    box-shadow:var(--shadow-1);
+    transition:box-shadow .2s ease,border-color .2s ease;
+}
+
+/* 表格：仅保留与全局不同的上间距 */
+#tool-express table{margin-top:20px;}
+
+/* 统计卡片 */
+#tool-express .stat-wrap{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;}
 #tool-express .stat-card{
-        flex:0 1 calc(25% - 9px);
-        padding:14px 16px;
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        background:var(--min-white);
-        box-shadow:var(--shadow-1);
-        min-width:0;
-    }
-#tool-express .stat-card .label{ font-size:12px; color:var(--min-gray); letter-spacing:1px; }
-#tool-express .stat-card .val{ font-size:18px; font-weight:700; margin-top:4px; color:var(--min-black); }
-    @media (max-width:900px){
-        #tool-express .stat-wrap .stat-card{ flex:1 1 calc(50% - 6px); min-width:0; }
-    }
+    flex:0 1 calc(25% - 9px);padding:14px 16px;
+    border:1px solid var(--min-line);border-radius:var(--min-radius);
+    background:var(--min-white);box-shadow:var(--shadow-1);min-width:0;
+}
+#tool-express .stat-card .label{font-size:12px;color:var(--min-gray);letter-spacing:1px;}
+#tool-express .stat-card .val{font-size:18px;font-weight:700;margin-top:4px;color:var(--min-black);}
+@media (max-width:900px){
+    #tool-express .stat-wrap .stat-card{flex:1 1 calc(50% - 6px);min-width:0;}
+}
+
+/* 折叠面板 */
 #tool-express .collapse-wrap{
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        background:var(--min-bg);
-        box-shadow:var(--shadow-1);
-        margin:16px 0;
-    }
+    border:1px solid var(--min-line);border-radius:var(--min-radius);
+    background:var(--min-bg);box-shadow:var(--shadow-1);margin:16px 0;
+}
 #tool-express .collapse-head{
-        padding:14px 18px;
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        cursor:pointer;
-        font-weight:700;
-        letter-spacing:2px;
-        user-select:none;
-    }
+    padding:14px 18px;display:flex;justify-content:space-between;align-items:center;
+    cursor:pointer;font-weight:700;letter-spacing:2px;user-select:none;
+}
 #tool-express .collapse-body{
-        padding:0 18px 18px 18px;
-        overflow:hidden;
-        max-height:0;
-        transition:max-height 0.32s ease;
-    }
-#tool-express .collapse-body.open{ max-height:1200px; }
+    padding:0 18px 18px;overflow:hidden;max-height:0;
+    transition:max-height .32s ease;
+}
+#tool-express .collapse-body.open{max-height:1200px;}
+
+/* 页签 */
 #tool-express .tab-bar{
-        display:flex;
-        gap:10px;
-        margin:14px 0 4px 0;
-        justify-content:space-between;
-        align-items:center;
-        flex-wrap:wrap;
-    }
+    display:flex;gap:10px;margin:14px 0 4px;
+    justify-content:space-between;align-items:center;flex-wrap:wrap;
+}
 #tool-express .tabs-left{
-        display:flex;
-        gap:6px;
-        flex-wrap:nowrap;
-        overflow-x:auto;
-        max-width:100%;
-        -webkit-overflow-scrolling:touch;
-    }
+    display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;max-width:100%;
+    -webkit-overflow-scrolling:touch;
+}
 #tool-express .tab-item{
-        padding:9px 16px;
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius) var(--min-radius) 0 0;
-        background:var(--min-tag);
-        cursor:pointer;
-        font-size:13px;
-        font-weight:600;
-        letter-spacing:1px;
-    }
-#tool-express .tab-item.active{
-        background:var(--min-white);
-        border-bottom-color:var(--min-white);
-    }
-#tool-express .tab-panel{ display:none; }
-#tool-express .tab-panel.active{ display:block; }
+    padding:9px 16px;border:1px solid var(--min-line);
+    border-radius:var(--min-radius) var(--min-radius) 0 0;
+    background:var(--min-tag);cursor:pointer;font-size:13px;font-weight:600;letter-spacing:1px;
+}
+#tool-express .tab-item.active{background:var(--min-white);border-bottom-color:var(--min-white);}
+#tool-express .tab-panel{display:none;}
+#tool-express .tab-panel.active{display:block;}
+
+/* 弹窗：模块弹窗尺寸更大，并保留自身入场动画
+   遮罩必须显式覆盖站点 .modal-mask 的隐藏态（opacity:0 / pointer-events:none），否则弹窗会“闪退” */
 #tool-express .modal-mask{
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,0.30);
-        display:none;
-        align-items:center;
-        justify-content:center;
-        z-index:99;
-        animation:maskIn 0.18s ease-out;
-    }
-@keyframes maskIn{ from {opacity:0;} to {opacity:1;} }
+    position:fixed;inset:0;background:rgba(0,0,0,.30);display:none;
+    align-items:center;justify-content:center;z-index:99;
+    opacity:1;pointer-events:auto;transition:none;
+    animation:maskIn .18s ease-out;
+}
+@keyframes maskIn{from{opacity:0;}to{opacity:1;}}
 #tool-express .modal{
-        background:var(--min-white);
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        box-shadow:var(--shadow-2);
-        padding:28px;
-        min-width:640px;
-        max-width:92vw;
-        max-height:86vh;
-        overflow-y:auto;
-        animation:modalIn 0.28s cubic-bezier(0.2,0.8,0.2,1);
-    }
+    background:var(--min-white);border:1px solid var(--min-line);
+    border-radius:var(--min-radius);box-shadow:var(--shadow-2);
+    padding:28px;min-width:640px;max-width:92vw;max-height:86vh;overflow-y:auto;
+    animation:modalIn .28s cubic-bezier(.2,.8,.2,1);
+}
 @keyframes modalIn{
-        from { opacity:0; transform: translateY(14px); }
-        to { opacity:1; transform: translateY(0); }
-    }
-#tool-express .modal h3{
-        font-size:16px;
-        font-weight:700;
-        letter-spacing:3px;
-        border-bottom:1px solid var(--min-line);
-        padding-bottom:12px;
-        margin-bottom:18px;
-        display:flex;
-        align-items:center;
-        gap:10px;
-    }
-#tool-express .modal h3::before{
-        content:""; width:12px;height:12px;
-        background:var(--min-black); border-radius:50%;
-    }
-#tool-express .row-line{
-        height:1px; background:var(--min-line); margin:12px 0;
-    }
-#tool-express .tag{
-        display:inline-block;
-        background:var(--min-white);
-        border:1px solid var(--min-line);
-        border-radius:var(--min-radius);
-        padding:4px 10px;
-        font-size:12px;
-        font-weight:600;
-        margin:2px 4px 2px 0;
-        color:var(--min-dark);
-    }
-#tool-express .color-bar{ display:none; }
-#tool-express .cfg-block{border:1px solid var(--min-line);border-radius:var(--min-radius);padding:18px;margin:14px 0;background:var(--min-bg);box-shadow:var(--shadow-1);}
-#tool-express .cfg-block h4{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;letter-spacing:2px;}
-#tool-express .cfg-block h4::before{content:"";width:10px;height:10px;background:var(--min-black);border-radius:50%;}
-#tool-express .drop-area{border:2px dashed var(--min-line);border-radius:var(--min-radius);padding:26px 20px;text-align:center;cursor:pointer;transition:0.2s;background:var(--min-white);}
+    from{opacity:0;transform:translateY(14px);}
+    to{opacity:1;transform:translateY(0);}
+}
+#tool-express .set-modal{max-height:88vh;overflow:auto;box-sizing:border-box;}
+
+/* 拖拽上传区 */
+#tool-express .drop-area{
+    border:2px dashed var(--min-line);border-radius:var(--min-radius);
+    padding:26px 20px;text-align:center;cursor:pointer;
+    transition:.2s;background:var(--min-white);
+}
 #tool-express .drop-area.hover{border-color:var(--min-black);background:var(--min-tag);}
-#tool-express .preview-table{width:100%;border-collapse:collapse;margin:10px 0;border:1px solid var(--min-line);border-radius:var(--min-radius);overflow:hidden;box-shadow:var(--shadow-1);}
-#tool-express .preview-table th, #tool-express .preview-table td{border-bottom:1px solid var(--min-line);border-right:1px solid var(--min-line);padding:9px;font-size:13px;text-align:center;white-space:nowrap;}
+
+/* 预览表：模块内更紧凑，且不换行 */
+#tool-express .preview-table{
+    width:100%;border-collapse:collapse;margin:10px 0;
+    border:1px solid var(--min-line);border-radius:var(--min-radius);
+    overflow:hidden;box-shadow:var(--shadow-1);
+}
+#tool-express .preview-table th,
+#tool-express .preview-table td{
+    border-bottom:1px solid var(--min-line);border-right:1px solid var(--min-line);
+    padding:9px;font-size:13px;text-align:center;white-space:nowrap;
+}
 #tool-express .preview-table th{background:var(--min-tag);font-weight:700;letter-spacing:1px;}
+
+/* 表单行 / 字段 */
 #tool-express .field-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;}
 #tool-express #deptTbody tr.row-editing td{background:#fff8e6;}
 #tool-express .field{flex:1 1 200px;margin:6px 0;min-width:0;}
-#tool-express .field label{display:block;font-size:12px;color:var(--min-gray);margin-bottom:6px;font-weight:600;}
+#tool-express .field label{
+    display:block;font-size:12px;color:var(--min-gray);
+    margin-bottom:6px;font-weight:600;
+}
 #tool-express .field select{width:100%;}
 #tool-express .hide{display:none!important;}
-#tool-express .warn-text{color:#c82423;font-weight:600;}
-#tool-express .banner-check{padding:10px 14px;border:1px solid var(--min-line);border-radius:var(--min-radius);font-size:13px;margin-bottom:12px;line-height:1.6;}
-#tool-express .banner-ok{background:#f0fff4;}
-#tool-express .banner-warn{background:#fff7e6;color:#874d00;}
-#tool-express hr{border:none;border-top:1px solid var(--min-line);margin:14px 0;}
-#tool-express .scroll{max-height:520px;overflow:auto;-webkit-overflow-scrolling:touch;}
-#tool-express .scroll::-webkit-scrollbar{height:10px;}
-#tool-express .scroll::-webkit-scrollbar-thumb{background:#c9c9c9;border-radius:5px;}
-#tool-express .file-info{font-size:12px;color:var(--min-gray);margin-top:10px;}
 #tool-express .muted{color:var(--min-gray);}
-#tool-express .group-title{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--min-black);margin:6px 0 4px;padding-left:10px;border-left:4px solid var(--min-black);}
-#tool-express .group-box{border:1px solid var(--min-line);border-radius:var(--min-radius);padding:14px 16px;background:var(--min-white);box-shadow:var(--shadow-1);margin-bottom:12px;}
-#tool-express .group-tip{font-size:12px;color:var(--min-gray);margin-top:6px;line-height:1.7;}
-#tool-express .summary-box{border:1px solid var(--min-line);border-left:6px solid var(--min-black);border-radius:var(--min-radius);background:var(--min-white);box-shadow:var(--shadow-1);padding:16px 20px;margin:16px 0 12px;}
-#tool-express .summary-box .sm-title{font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:8px;}
-#tool-express .summary-box .sm-main{font-size:16px;line-height:1.9;}
-#tool-express .summary-box .sm-main b{font-size:20px;}
-#tool-express .summary-box .sm-sub{font-size:13px;color:var(--min-gray);margin-top:6px;line-height:1.9;}
-#tool-express .dp-wrap{position:relative;min-width:150px;}
-#tool-express .dp-btn{width:100%;min-height:26px;padding:4px 8px;font-size:12px;line-height:1.35;text-align:left;border-radius:6px;border:1px solid var(--min-line);background:var(--min-white);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px;}
-#tool-express .dp-btn:hover{border-color:#bbb;}
-#tool-express .dp-ph{color:#999;}
-#tool-express .dp-arrow{color:#999;font-size:11px;flex:0 0 auto;}
-#tool-express .dp-panel{position:fixed;z-index:10070;background:#fff;border:1px solid var(--min-line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;box-sizing:border-box;}
-#tool-express .dp-search{width:100%;box-sizing:border-box;font-size:12px;padding:5px 8px;border:1px solid var(--min-line);border-radius:6px;outline:none;}
-#tool-express .dp-search:focus{border-color:#888;}
-#tool-express .dp-list{margin-top:6px;max-height:240px;overflow:auto;}
-#tool-express .dp-item{padding:6px 8px;border-radius:6px;cursor:pointer;display:flex;flex-direction:column;gap:2px;}
-#tool-express .dp-item:hover{background:#f4f4f4;}
-#tool-express .dp-item.active{background:#efefef;}
-#tool-express .dp-name{font-size:12px;color:#222;line-height:1.4;}
-#tool-express .dp-empty{padding:10px 8px;font-size:12px;color:#999;}
-#tool-express .row-select{padding:4px 6px;font-size:12px;border-radius:6px;border:1px solid var(--min-line);background:var(--min-white);}
-#tool-express .op-btn{padding:4px 10px;font-size:12px;border-radius:6px;border:1px solid var(--min-line);background:var(--min-tag);cursor:pointer;font-weight:600;}
-#tool-express .op-btn:hover{background:var(--min-black);color:var(--min-white);}
-#tool-express .op-btn.op-primary{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
-#tool-express .op-btn.op-primary:hover{opacity:.85;}
+#tool-express .file-info{font-size:12px;color:var(--min-gray);margin-top:10px;}
 #tool-express .editable-tip{font-size:12px;color:var(--min-gray);margin:8px 0 0;}
-#tool-express .action-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border:1px solid var(--min-line);border-radius:var(--min-radius);background:var(--min-white);box-shadow:var(--shadow-1);padding:14px 16px;margin:14px 0;}
-#tool-express .action-bar .spacer{flex:1 1 auto;}
-#tool-express .search-wrap{display:flex;align-items:center;gap:6px;border:1px solid var(--min-line);border-radius:8px;padding:0 10px;background:var(--min-white);height:38px;}
-#tool-express .search-wrap input[type="text"]{
-        border:none!important;outline:none;height:100%;flex:1 1 auto;min-width:0;width:auto;
-        font-family:inherit;font-size:13px;background:transparent!important;
-        box-shadow:none!important;border-radius:0!important;padding:0 4px;
-    }
-#tool-express .search-wrap input[type="text"]:focus{box-shadow:none!important;border:none!important;}
-#tool-express .search-clear{
-        background:none!important;border:none!important;box-shadow:none!important;
-        cursor:pointer;color:var(--min-gray);font-size:16px;padding:0 2px;line-height:1;
-        width:22px;height:100%;display:flex;align-items:center;justify-content:center;
-    }
-#tool-express .search-clear:hover{color:var(--min-black);}
-#tool-express .search-row{margin:0 0 12px;}
+#tool-express .col-hint{font-size:12px;color:var(--min-gray);}
+
+/* 提示条 */
+#tool-express .warn-text{color:#c82423;font-weight:600;}
 #tool-express .warn-file{color:var(--min-dark);margin-bottom:6px;}
 #tool-express .warn-line{margin:4px 0;font-size:13px;}
 #tool-express .warn-line.danger{color:#c0392b;}
 #tool-express .warn-line.muted{color:var(--min-gray);}
-#tool-express .hk{display:inline-block;padding:1px 6px;margin:0 4px 4px 0;background:var(--min-tag);border-radius:4px;font-size:12px;}
-#tool-express .search-row .search-wrap{width:420px;max-width:100%;}
+#tool-express .banner-check{
+    padding:10px 14px;border:1px solid var(--min-line);
+    border-radius:var(--min-radius);font-size:13px;margin-bottom:12px;line-height:1.6;
+}
+#tool-express .banner-ok{background:#f0fff4;}
+#tool-express .banner-warn{background:#fff7e6;color:#874d00;}
+#tool-express .hk{
+    display:inline-block;padding:1px 6px;margin:0 4px 4px 0;
+    background:var(--min-tag);border-radius:4px;font-size:12px;
+}
+
+/* 滚动容器 */
+#tool-express .scroll{max-height:520px;overflow:auto;-webkit-overflow-scrolling:touch;}
+#tool-express .scroll::-webkit-scrollbar{height:10px;}
+#tool-express .scroll::-webkit-scrollbar-thumb{background:#c9c9c9;border-radius:5px;}
+
+/* 分组 / 汇总 */
+#tool-express .group-title{
+    font-size:13px;font-weight:700;letter-spacing:2px;color:var(--min-black);
+    margin:6px 0 4px;padding-left:10px;border-left:4px solid var(--min-black);
+}
+#tool-express .group-box{
+    border:1px solid var(--min-line);border-radius:var(--min-radius);
+    padding:14px 16px;background:var(--min-white);box-shadow:var(--shadow-1);margin-bottom:12px;
+}
+#tool-express .group-tip{font-size:12px;color:var(--min-gray);margin-top:6px;line-height:1.7;}
+#tool-express .summary-box{
+    border:1px solid var(--min-line);border-left:6px solid var(--min-black);
+    border-radius:var(--min-radius);background:var(--min-white);
+    box-shadow:var(--shadow-1);padding:16px 20px;margin:16px 0 12px;
+}
+#tool-express .summary-box .sm-title{font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:8px;}
+#tool-express .summary-box .sm-main{font-size:16px;line-height:1.9;}
+#tool-express .summary-box .sm-main b{font-size:20px;}
+#tool-express .summary-box .sm-sub{font-size:13px;color:var(--min-gray);margin-top:6px;line-height:1.9;}
+
+/* 自定义下拉（dp-*）：模块独有的浮层组件 */
+#tool-express .dp-wrap{position:relative;min-width:150px;}
+#tool-express .dp-btn{
+    width:100%;min-height:26px;padding:4px 8px;font-size:12px;line-height:1.35;
+    text-align:left;border-radius:6px;border:1px solid var(--min-line);
+    background:var(--min-white);cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+}
+#tool-express .dp-btn:hover{border-color:#bbb;}
+#tool-express .dp-ph{color:#999;}
+#tool-express .dp-arrow{color:#999;font-size:11px;flex:0 0 auto;}
+#tool-express .dp-panel{
+    position:fixed;z-index:10070;background:#fff;border:1px solid var(--min-line);
+    border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;box-sizing:border-box;
+}
+#tool-express .dp-search{
+    width:100%;box-sizing:border-box;font-size:12px;padding:5px 8px;
+    border:1px solid var(--min-line);border-radius:6px;outline:none;
+}
+#tool-express .dp-search:focus{border-color:#888;}
+#tool-express .dp-list{margin-top:6px;max-height:240px;overflow:auto;}
+#tool-express .dp-item{
+    padding:6px 8px;border-radius:6px;cursor:pointer;
+    display:flex;flex-direction:column;gap:2px;
+}
+#tool-express .dp-item:hover{background:#f4f4f4;}
+#tool-express .dp-item.active{background:#efefef;}
+#tool-express .dp-name{font-size:12px;color:#222;line-height:1.4;}
+#tool-express .dp-empty{padding:10px 8px;font-size:12px;color:#999;}
+
+/* 行内小控件 */
+#tool-express .row-select{
+    padding:4px 6px;font-size:12px;border-radius:6px;
+    border:1px solid var(--min-line);background:var(--min-white);
+}
+#tool-express .op-btn{
+    padding:4px 10px;font-size:12px;border-radius:6px;
+    border:1px solid var(--min-line);background:var(--min-tag);cursor:pointer;font-weight:600;
+}
+#tool-express .op-btn:hover{background:var(--min-black);color:var(--min-white);}
+#tool-express .op-btn.op-primary{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
+#tool-express .op-btn.op-primary:hover{opacity:.85;}
 #tool-express .cell-ops{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;}
-#tool-express .col-hint{font-size:12px;color:var(--min-gray);}
+
+/* 操作条 / 搜索框 */
+#tool-express .action-bar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    border:1px solid var(--min-line);border-radius:var(--min-radius);
+    background:var(--min-white);box-shadow:var(--shadow-1);
+    padding:14px 16px;margin:14px 0;
+}
+#tool-express .action-bar .spacer{flex:1 1 auto;}
+#tool-express .search-wrap{
+    display:flex;align-items:center;gap:6px;
+    border:1px solid var(--min-line);border-radius:8px;
+    padding:0 10px;background:var(--min-white);height:38px;
+}
+#tool-express .search-wrap input[type="text"]{
+    border:none!important;outline:none;height:100%;flex:1 1 auto;min-width:0;width:auto;
+    font-family:inherit;font-size:13px;background:transparent!important;
+    box-shadow:none!important;border-radius:0!important;padding:0 4px;
+}
+#tool-express .search-wrap input[type="text"]:focus{box-shadow:none!important;border:none!important;}
+#tool-express .search-clear{
+    background:none!important;border:none!important;box-shadow:none!important;
+    cursor:pointer;color:var(--min-gray);font-size:16px;padding:0 2px;line-height:1;
+    width:22px;height:100%;display:flex;align-items:center;justify-content:center;
+}
+#tool-express .search-clear:hover{color:var(--min-black);}
+#tool-express .search-row{margin:0 0 12px;}
+#tool-express .search-row .search-wrap{width:420px;max-width:100%;}
+
+/* 设置面板页签 / 关键词 chips */
 #tool-express .set-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-#tool-express .set-tab{padding:8px 14px;font-size:13px;border:1px solid var(--min-line);border-radius:6px;background:var(--min-tag);cursor:pointer;font-weight:600;}
+#tool-express .set-tab{
+    padding:8px 14px;font-size:13px;border:1px solid var(--min-line);
+    border-radius:6px;background:var(--min-tag);cursor:pointer;font-weight:600;
+}
 #tool-express .set-tab.active{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
 #tool-express .kw-list{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
-#tool-express .kw-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--min-line);border-radius:16px;background:var(--min-white);font-size:13px;}
+#tool-express .kw-chip{
+    display:inline-flex;align-items:center;gap:6px;padding:5px 10px;
+    border:1px solid var(--min-line);border-radius:16px;
+    background:var(--min-white);font-size:13px;
+}
 #tool-express .kw-chip button{border:none;background:none;cursor:pointer;color:#c82423;font-weight:700;}
-/* 快递月结：卡片宽度与站点对齐，窄屏弹窗可用 */
-#tool-express .container{max-width:1240px;}
-#tool-express .tip{background:var(--accent-red);border-color:var(--accent-red);color:#fff;font-weight:600;}
-/* 快递月结遮罩：站点 .modal-mask 自带 opacity:0 / pointer-events:none，
-   必须显式覆盖，否则弹窗淡入 0.18s 后立刻透明，表现为闪退 */
-#tool-express .modal-mask{opacity:1;pointer-events:auto;transition:none;}
-  #tool-express .set-modal{max-height:88vh;overflow:auto;box-sizing:border-box;}
+
 @media (max-width:768px){
     #tool-express .modal{min-width:0!important;width:100%;max-width:100%;padding:18px;}
     #tool-express .modal-mask{padding:12px;}
@@ -1634,9 +1459,10 @@
     #tool-express .set-tabs .set-tab{font-size:12px;padding:7px 10px;}
 }
 
-    /* ========== 首页：新版式（网点背景 + 居中 Hero） ========== */
-    body:has(#view-home:not([hidden])){background:var(--min-white);}
-    .site-body:has(#view-home:not([hidden])){
+    /* 首页：新版式（网点背景 + 居中 Hero）
+       兼容性：旧浏览器不支持 :has()，改为 body.is-home 由路由脚本切换 */
+    body.is-home{background:var(--min-white);}
+    .site-body.is-home{
         padding:0;background:var(--min-white);
         min-height:calc(100vh - 54px);
     }
@@ -2612,6 +2438,20 @@ function mtCloudPush(key){
       <div class="log-date"><b>11/15</b>2026</div>
       <div class="log-rail" aria-hidden="true"></div>
       <div class="log-body">
+        <h3>离线部署与样式重构<span class="log-tag">工程优化</span></h3>
+        <ul>
+          <li>去掉全部外部依赖：xlsx 改为本地 「vendor/xlsx.full.min.js」，exceljs 改为导出时按需加载 「vendor/exceljs.min.js」，断网、纯内网环境同样能导入导出 Excel；在线字体与预连接一并移除，改用系统字体栈。</li>
+          <li>快递月结整段样式去重：删除重复的整套按钮 / 表格 / 弹窗 / 容器 / 动画定义，通用组件统一复用全局样式，只保留该模块真正独有的规则，样式体积明显变小，后续改全局样式不再需要改两处。</li>
+          <li>首页白底版式不再依赖 CSS 「:has()」，改由路由给 body / .site-body 切换 「is-home」 类名，老内核浏览器也不会错版。</li>
+          <li>补全页面描述 meta，其余布局、交互与业务流程与上一版保持一致（已逐屏比对确认）。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="log-item">
+      <div class="log-date"><b>11/15</b>2026</div>
+      <div class="log-rail" aria-hidden="true"></div>
+      <div class="log-body">
         <h3>部门匹配与人工确认<span class="log-tag">效率优化</span></h3>
         <ul>
           <li>花名册路径与公司对照表层级不一致时，按「/」逐级砍掉最前面一级继续精确比对，最多砍到只剩两级，仍对不上才判「未找到部门」；未匹配原因不再错显人员类型，人员类型单独一列。</li>
@@ -2738,7 +2578,7 @@ function mtCloudPush(key){
 
 </div>
 
-<script src="https://fastly.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="./vendor/xlsx.full.min.js"></script>
 <script>
 /* ===== 站点路由（仅新增，不进台账逻辑） ===== */
 var VIEWS = {home:'view-home', tools:'view-tools', docs:'view-docs', log:'view-log'};
@@ -2851,6 +2691,10 @@ function renderRoute(){
         else navs[i2].removeAttribute('aria-current');
     }
     document.title = TITLES[key] || '巡查台账';
+    /* 首页白底版式：用 body / .site-body 的 class 代替 CSS :has()，兼容旧浏览器 */
+    document.body.classList.toggle('is-home', key === 'home');
+    var siteBody = document.querySelector('.site-body');
+    if (siteBody) siteBody.classList.toggle('is-home', key === 'home');
     /* 每次切视图重播一次入场动画 */
     var shown = document.getElementById(VIEWS[key]);
     if (shown){
@@ -5605,22 +5449,16 @@ function exportExcel() {
   exportPlain();
 }
 
-/* 按需加载 exceljs（只有导出时才拉，不拖慢首屏） */
+/* 按需加载 exceljs（只有导出时才拉，不拖慢首屏）；离线部署：走本地 vendor 目录 */
 var exceljsP = null;
 function ensureExcelJS() {
   if (window.ExcelJS) return Promise.resolve();
   if (exceljsP) return exceljsP;
   exceljsP = new Promise(function (res, rej) {
     var s1 = document.createElement("script");
-    s1.src = "https://fastly.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";
+    s1.src = "./vendor/exceljs.min.js";
     s1.onload = function () { res(); };
-    s1.onerror = function () {
-      var s2 = document.createElement("script");
-      s2.src = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js";
-      s2.onload = function () { res(); };
-      s2.onerror = function () { rej(new Error("exceljs 加载失败")); };
-      document.head.appendChild(s2);
-    };
+    s1.onerror = function () { rej(new Error("exceljs 加载失败（请检查 vendor/exceljs.min.js 是否存在）")); };
     document.head.appendChild(s1);
   });
   return exceljsP;
