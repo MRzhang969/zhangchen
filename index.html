@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>巡查台账</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fafafa'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23111111'/%3E%3C/svg%3E">
+<title>MINI TOOLKIT</title>
+<link rel="icon" href="data:image/png;base64,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">
+
 <meta name="description" content="MINI TOOLKIT · 巡查台账 / 快递月结，纯前端离线可用工具">
 <meta name="theme-color" content="#111111">
 <!-- 离线部署：不引用任何外部 CDN / 字体服务，全部使用系统字体栈 -->
@@ -46,21 +47,19 @@
     button, input, textarea, select {
         font-family: inherit;
     }
+    /* 入场：向上淡入。原来 bodyIn / cardIn / tableIn 三份完全同构的关键帧
+       合并成一份，距离用 --in-y 传参，少两份重复定义 */
+    @keyframes fadeUpIn {
+        from { opacity: 0; transform: translateY(var(--in-y, 8px)); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
     /* 原 body 的内边距与入场动画，原样移到包裹层，视觉不变 */
     .site-body {
         padding: 40px 28px;
-        animation: bodyIn 0.5s ease-out;
+        --in-y: 6px;
+        animation: fadeUpIn 0.5s ease-out;
     }
-    @keyframes bodyIn {
-        from {
-            opacity: 0;
-            transform: translateY(6px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    
     .container {
         max-width: 1240px;
         margin: 0 auto;
@@ -69,18 +68,10 @@
         border-radius: var(--min-radius);
         box-shadow: var(--shadow-1);
         padding: 36px;
-        animation: cardIn 0.5s ease-out;
+        --in-y: 10px;
+        animation: fadeUpIn 0.5s ease-out;
     }
-    @keyframes cardIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    
     .header {
         display: flex;
         align-items: baseline;
@@ -293,18 +284,10 @@
         border-radius: var(--min-radius);
         overflow: hidden;
         box-shadow: var(--shadow-1);
-        animation: tableIn 0.5s ease-out;
+        --in-y: 8px;
+        animation: fadeUpIn 0.5s ease-out;
     }
-    @keyframes tableIn {
-        from {
-            opacity: 0;
-            transform: translateY(8px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    
     th,
     td {
         padding: 12px 14px;
@@ -761,7 +744,7 @@
         font-size: 13px;
         line-height: 1.9;
         color: var(--min-gray);
-        max-width: 46em;
+        max-width: 572px;
     }
     .sec-line {
         display: flex;
@@ -940,13 +923,15 @@
         font-size: 13px;
         line-height: 1.9;
         color: var(--min-gray);
-        max-width: 44em;
+        max-width: 100%;
     }
     .doc-entry ul {
         margin: 10px 0 0;
         padding: 0;
         list-style: none;
-        max-width: 44em;
+        /* 显式给 13px：否则继承根字号 16px，44em 会比段落宽出一截 */
+        font-size: 13px;
+        max-width: 100%;
     }
     .doc-entry li {
         position: relative;
@@ -974,7 +959,7 @@
         font-size: 12px;
         line-height: 1.8;
         color: var(--min-dark);
-        max-width: 44em;
+        max-width: 100%;
     }
     .toc-line {
         display: flex;
@@ -1010,6 +995,72 @@
     .toc-btn:focus-visible {
         outline: 2px solid var(--min-black);
         outline-offset: 3px;
+    }
+
+    /* ===== 文档双栏：正文 + 右侧竖排目录（桌面端） ===== */
+    .doc-wrap { max-width: none; }
+    .doc-wrap .page-lede {
+        max-width: 100%;
+    }
+    @media (min-width: 901px) {
+        .doc-wrap {
+            display: grid;
+            /* 固定列宽 + 整体居中：正文 760、目录 200、间隔 56，合计 1016 */
+            grid-template-columns: 760px 200px;
+            justify-content: center;
+            column-gap: 56px;
+            align-items: start;
+        }
+        /* 导语只占正文列：不再横跨到目录列，避免文字压到目录 */
+        .doc-wrap .page-lede { grid-column: 1; grid-row: 1; }
+        .doc-main { grid-column: 1; grid-row: 2; min-width: 0; }
+        /* 目录从第一行就开始，上方不留任何文字，与导语首行顶对齐 */
+        .doc-side {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            position: sticky;
+            top: 84px;
+            padding-top: 0;
+        }
+        .doc-side-h {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--min-light);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--min-line);
+        }
+        /* 竖排目录：左侧细线 + 高亮竖条，点击滚动定位 */
+        .doc-side .toc-line {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            gap: 0;
+            margin-top: 6px;
+            padding: 0;
+            border-bottom: 0;
+            border-left: 1px solid var(--min-line);
+        }
+        .doc-side .toc-btn {
+            text-align: left;
+            padding: 8px 0 8px 14px;
+            margin-left: -1px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: .5px;
+            color: var(--min-light);
+            border: 0;
+            border-left: 2px solid transparent;
+            transition: color .16s ease, border-color .16s ease;
+        }
+        .doc-side .toc-btn:hover {
+            color: var(--min-black);
+            border-left-color: var(--min-black);
+        }
+        .doc-wrap .doc-entry:last-child { border-bottom: 0; padding-bottom: 0; }
+    }
+    @media (max-width: 900px) {
+        .doc-wrap { max-width: none; }
+        .doc-side-h { display: none; }
     }
 
     /* 更新日志时间轴 */
@@ -1167,7 +1218,8 @@
 
     /* 视图切换：每次进入都重播一次入场动画（首页与工具/文档/日志一致） */
     .container.view-in {
-        animation: cardIn 0.5s ease-out;
+        --in-y: 10px;
+        animation: fadeUpIn 0.5s ease-out;
     }
 
 /* ===== 工具 / 文档 页内切换条 ===== */
@@ -1517,7 +1569,8 @@
     .hm-hero{
         text-align:center;max-width:760px;
         margin:0 auto;
-        animation:cardIn .5s ease-out;
+        --in-y:10px;
+        animation:fadeUpIn .5s ease-out;
     }
     .hm-title{
         font-family:"PingFang SC","Microsoft Yahei","Helvetica Neue",system-ui,sans-serif;
@@ -1586,6 +1639,7 @@
   .mt-mask{transition:none !important}
   .mt-mask .mt-modal{transition:none !important}
   .mt-avatar-wrap{animation:none !important}
+  .mt-avatar.pop{animation:none !important}
 }
 .mt-login-btn{font-family:inherit;font-size:13px;font-weight:600;letter-spacing:1px;color:#fff;background:var(--min-black);border:0;border-radius:999px;padding:9px 16px;cursor:pointer;transition:background .18s ease}
 .mt-login-btn:hover{background:var(--min-dark)}
@@ -1595,6 +1649,14 @@
   from{opacity:0;transform:translateY(-6px) scale(.9)}
   to{opacity:1;transform:translateY(0) scale(1)}
 }
+/* 登录成功反馈：头像回弹脉冲，只在登录成功时触发一次（关闭弹窗不触发） */
+@keyframes mtAvatarPop{
+  0%{transform:scale(1)}
+  45%{transform:scale(1.16)}
+  75%{transform:scale(.98)}
+  100%{transform:scale(1)}
+}
+.mt-avatar.pop{animation:mtAvatarPop .42s cubic-bezier(.34,1.4,.64,1)}
 .mt-avatar-btn{border:0;background:transparent;cursor:pointer;padding:3px;border-radius:999px;display:block;line-height:0}
 .mt-avatar-btn:hover{background:var(--min-tag)}
 .mt-avatar{width:32px;height:32px;border-radius:50%;background:var(--min-black);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:600;letter-spacing:0}
@@ -1610,29 +1672,39 @@
 .mt-dd-item:hover{background:var(--min-tag)}
 .mt-dd-out{color:var(--accent-red)}
 
-/* 遮罩：始终 display:flex，靠 opacity + visibility 过渡，才能既有淡入也有淡出
-   （display:none ↔ flex 的瞬切会让 transition 失效，表现为直接闪现/消失） */
+/* 遮罩：始终 display:flex，靠 opacity + visibility 过渡，淡入、淡出都能正常播放
+   （display:none ↔ flex 的瞬切会让 transition 失效，表现为直接闪现 / 消失） */
 .mt-mask{
-  position:fixed;inset:0;z-index:95;padding:24px;
+  position:fixed;inset:0;z-index:130;padding:24px;
   background:rgba(20,20,20,.30);
   -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
   display:flex;align-items:center;justify-content:center;
   opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .26s var(--modal-ease), visibility 0s linear .26s;
+  transition:opacity .24s ease, visibility 0s linear .24s;
 }
 .mt-mask.open{
   opacity:1;visibility:visible;pointer-events:auto;
-  transition:opacity .26s var(--modal-ease), visibility 0s linear 0s;
+  transition:opacity .24s ease, visibility 0s linear 0s;
 }
+/* 弹窗本体：显式不透明底色 + 独立层级 + 自身定位上下文，
+   防止被外部样式覆盖成透明、或被其它弹窗压到下面看不见 */
 .mt-modal{
-  width:100%;max-width:480px;background:#fff;
+  position:relative;
+  width:100%;max-width:480px;background:#fff;color:var(--min-black);
   border:1px solid var(--min-line);border-radius:16px;
   padding:44px 40px;box-shadow:0 24px 70px rgba(0,0,0,.16);
   max-height:calc(100vh - 48px);overflow:auto;
-  transform:translateY(12px) scale(.98);opacity:0;
-  transition:transform .26s var(--modal-ease), opacity .26s var(--modal-ease);
+  opacity:0;transform:scale(.9);
+  transition:transform .34s cubic-bezier(.34,1.45,.64,1), opacity .2s ease;
+  will-change:transform,opacity;
 }
-.mt-mask.open .mt-modal{transform:translateY(0) scale(1);opacity:1}
+/* 入场：弹簧弹性放大弹出 + 遮罩淡入 */
+.mt-mask.open .mt-modal{opacity:1;transform:scale(1)}
+/* 退场：关闭弹窗与登录成功共用同一套原地缩放收回，只做反馈区分（不位移、不飞向头像） */
+.mt-mask.closing .mt-modal{
+  opacity:0;transform:scale(.9);
+  transition:transform .2s ease-in, opacity .16s ease;
+}
 .mt-brand{display:flex;align-items:center;gap:11px;margin-bottom:34px}
 .mt-brand .mt-lm{width:13px;height:13px;background:var(--min-black);flex:none}
 .mt-brand b{font-size:15px;font-weight:600;letter-spacing:.2em;color:var(--min-black)}
@@ -1687,7 +1759,7 @@
 
 @media (max-width:768px){
   .mt-dd{width:210px}
-  .mt-modal{padding:26px 20px}
+  .mt-modal{padding:30px 20px 26px}
   .mt-avatar{width:28px;height:28px;font-size:13px}
   .mt-login-btn{padding:8px 13px;font-size:12px}
 }
@@ -2359,15 +2431,23 @@ function mtCloudPush(key){
       <span>识别规则·配置项·数据去向</span>
     </div>
     <div id="doc-archive">
-    <p class="page-lede">下文对识别、校对、配置及数据存放进行说明，问题排查请按此顺序执行。</p>
+      <div class="doc-wrap">
+        <p class="page-lede">下文对识别、校对、配置及数据存放进行说明，问题排查请按此顺序执行。</p>
+        <aside class="doc-side">
+          <div class="doc-side-h">目录 / CONTENTS</div>
+          <div class="toc-line">
+                <button type="button" class="toc-btn" onclick="scrollToSec('d1')">01 录入与识别</button>
+                <button type="button" class="toc-btn" onclick="scrollToSec('d2')">02 校对与同步时间</button>
+                <button type="button" class="toc-btn" onclick="scrollToSec('d3')">03 配置板块</button>
+                <button type="button" class="toc-btn" onclick="scrollToSec('d4')">04 数据与备份</button>
+                <button type="button" class="toc-btn" onclick="scrollToSec('d5')">05 常见问题</button>
+                <button type="button" class="toc-btn" onclick="scrollToSec('d6')">06 登录与同步</button>
+              </div>
+        </aside>
+        <div class="doc-main">
+            
 
-    <div class="toc-line">
-      <button type="button" class="toc-btn" onclick="scrollToSec('d1')">01 录入与识别</button>
-      <button type="button" class="toc-btn" onclick="scrollToSec('d2')">02 校对与同步时间</button>
-      <button type="button" class="toc-btn" onclick="scrollToSec('d3')">03 配置板块</button>
-      <button type="button" class="toc-btn" onclick="scrollToSec('d4')">04 数据与备份</button>
-      <button type="button" class="toc-btn" onclick="scrollToSec('d5')">05 常见问题</button>
-    </div>
+    
 
     <div class="doc-entry" id="d1">
       <h3><i>01</i>录入与识别</h3>
@@ -2407,7 +2487,7 @@ function mtCloudPush(key){
 
     <div class="doc-entry" id="d4">
       <h3><i>04</i>数据与备份</h3>
-      <p>台账记录与配置都存在本机浏览器的 localStorage 里，不上传服务器。清缓存、换设备、无痕模式，数据都不会跟过去。</p>
+      <p>未登录时，台账记录与配置都存在本机浏览器的 localStorage 里，不上传服务器；登录后按「06 登录与同步」的规则同步云端。清缓存、换设备、无痕模式时若没有登录，数据不会跟过去。</p>
       <ul>
         <li>“导出”把全部记录写成 xlsx，同时记下导出时间；</li>
         <li>“导入”读入一个 xlsx 后会问：追加合并（保留原记录，新记录加在后面，五项全同的自动跳过不重复）或覆盖替换（清空原记录只留这个文件），换设备恢复旧表一般选覆盖；</li>
@@ -2426,19 +2506,41 @@ function mtCloudPush(key){
       </ul>
     </div>
 
+    <div class="doc-entry" id="d6">
+      <h3><i>06</i>登录与同步</h3>
+      <p>点右上角「登录」按钮唤起登录面板。登录成功后入口换成头像并亮起绿点，点开可查看账号与同步状态；账号密码校验失败时面板不会关闭，已填内容保留，下方红字说明具体原因。</p>
+      <ul>
+        <li>同步范围：登录后，台账的配置与清单随账号同步，换台电脑登录即可接着用；</li>
+        <li>记住密码：勾选后本地保存账号与密码，有效期 7 天，到期自动清除；共用电脑建议不勾选；</li>
+        <li>关闭面板：点遮罩空白处或底部「关闭」都能退出。</li>
+      </ul>
+      <div class="doc-tip">未登录也能照常使用，数据仅存本机；清理浏览器记录会一并丢失，重要配置仍建议定期导出备份。</div>
+    </div>
+
+    
+        </div>
+      </div>
     </div>
 
     
     <div id="doc-express" hidden>
-      <p class="page-lede">顺丰月结账单按姓名匹配部门，账单本身不含工号；到付单不自动计算，逐条由你决定加入账单还是删除。下面按实际操作顺序，把每个功能怎么用说清楚。</p>
+      <div class="doc-wrap">
+        <p class="page-lede">顺丰月结账单按姓名匹配部门，账单本身不含工号；到付单不自动计算，逐条由你决定加入账单还是删除。下面按实际操作顺序，把每个功能怎么用说清楚。</p>
+        <aside class="doc-side">
+          <div class="doc-side-h">目录 / CONTENTS</div>
+          <div class="toc-line">
+                  <button type="button" class="toc-btn" onclick="scrollToSec('x1')">01 上传两份表</button>
+                  <button type="button" class="toc-btn" onclick="scrollToSec('x2')">02 识别与主界面</button>
+                  <button type="button" class="toc-btn" onclick="scrollToSec('x3')">03 五个结果标签</button>
+                  <button type="button" class="toc-btn" onclick="scrollToSec('x4')">04 设置五个页签</button>
+                  <button type="button" class="toc-btn" onclick="scrollToSec('x5')">05 导出与常见问题</button>
+                  <button type="button" class="toc-btn" onclick="scrollToSec('x6')">06 登录与同步</button>
+                </div>
+        </aside>
+        <div class="doc-main">
+              
 
-      <div class="toc-line">
-        <button type="button" class="toc-btn" onclick="scrollToSec('x1')">01 上传两份表</button>
-        <button type="button" class="toc-btn" onclick="scrollToSec('x2')">02 识别与主界面</button>
-        <button type="button" class="toc-btn" onclick="scrollToSec('x3')">03 五个结果标签</button>
-        <button type="button" class="toc-btn" onclick="scrollToSec('x4')">04 设置五个页签</button>
-        <button type="button" class="toc-btn" onclick="scrollToSec('x5')">05 导出与常见问题</button>
-      </div>
+      
 
       <div class="doc-entry" id="x1">
         <h3><i>01</i>上传两份表</h3>
@@ -2449,7 +2551,7 @@ function mtCloudPush(key){
           <li>表头默认：账单默认把第 2 行当表头（顺丰原表第 1 行是合并大标题），花名册默认第 1 行，上传后直接解析，不弹窗问你选表；</li>
           <li>上传后区域下方会显示读到的行数与表头行，想确认读对没有，先看这一行；读不出表头（换个表头行、表里有多张工作表）会弹提醒，点「去字段识别」跳到设置，改工作表或表头行号，再点「按当前设置重新解析」；</li>
           <li>没有真实表格也能先试：点「这里载入演示数据排查一下」，会填一套 12 条账单 + 8 人花名册，跑完能看清整个流程；</li>
-          <li>花名册只认「行政组织名称」这一列：拿完整路径去「设置 → 部门映射」里对同一字段，对上就直接取该行的核算组织编码与核算组织名称，花名册不用写编码；路径首尾多写的「/」、连续「//」会自动忽略。顺丰导出的路径和公司对照表层级不一致时，会逐级砍掉最前面一级再比（如「硬件工程系统/产品开发中心/产品开发二部/射频组」→「产品开发中心/产品开发二部/射频组」→「产品开发二部/射频组」），最多砍到只剩两级，仍然对不上才进未匹配、原因显示「未找到部门」。</li>
+          <li>花名册只认「行政组织名称」这一列：拿完整路径去「设置 → 部门映射」里对同一字段，对上就直接取该行的核算组织编码与核算组织名称，花名册不用写编码；路径首尾多写的「/」、连续「//」会自动忽略。顺丰导出的路径和公司对照表层级不一致时，会逐级砍掉最前面一级再比对，最多砍到只剩两级，仍然对不上才进未匹配、原因显示「未找到部门」。</li>
         </ul>
       </div>
 
@@ -2505,7 +2607,7 @@ function mtCloudPush(key){
       <div class="doc-entry" id="x5">
         <h3><i>05</i>导出、数据与常见问题</h3>
         <p>点「导出汇总 Excel」生成 xlsx：部门汇总、明细清单、未匹配清单、到付清单（含每条的处理状态：待处理 / 已加入账单 / 已删除）；有手工忽略的行会多一张「人工忽略清单」。明细清单按原账单整行照搬，列顺序不变，只在末尾补工号（花名册）、部门编码、部门名称三列，不再导出部门配置表。</p>
-        <p>配置与映射都存在本机浏览器里，不上传服务器：清缓存、换浏览器、无痕模式都不会跟过去，换设备前先导出一份配置备份。</p>
+        <p>配置与映射默认存在本机浏览器里：未登录时清缓存、换浏览器、无痕模式都不会跟过去，换设备前先导出一份配置备份；登录后配置随账号同步，表单录入内容仍只在本地。</p>
         <ul>
           <li>大半记录进未匹配：先核对花名册的行政组织名称和「部门映射」里的行政组织名称，首尾斜杠会自动忽略，但空格、括号、层级文字、全角半角必须一致；再查姓名有没有多余空格或重名；</li>
           <li>明明路径一样却没匹配上：把两边路径复制出来逐段比对，常见是多一个空格、括号用了全角、或层级名称写的是简称；</li>
@@ -2514,6 +2616,21 @@ function mtCloudPush(key){
           <li>金额校验不匹配：说明有单据没落进四个去向，先看是不是有行被作废后又改了部门，重跑一次识别即可复原；</li>
           <li>手机上表格显示不全：表格按桌面宽度排版，横向滑动查看全部列，逐条处理建议在电脑上做。</li>
         </ul>
+      </div>
+
+      <div class="doc-entry" id="x6">
+        <h3><i>06</i>登录与同步</h3>
+        <p>点右上角「登录」按钮唤起登录面板。登录成功后入口换成头像，点开可查看账号与同步状态；账号密码校验失败时面板不会关闭，已填内容保留，下方红字说明具体原因。</p>
+        <ul>
+          <li>同步范围：只同步配置数据，部门映射、人员映射、人员类型规则、字段识别、表结构随账号走，换台电脑登录后不必重配；</li>
+          <li>表单内容：上传的账单、花名册以及识别后的清单、到付处理状态只在本地处理，不上传云端，换设备或清理浏览器记录后不会自动回来；</li>
+          <li>记住密码：勾选后本地保存账号与密码，有效期 7 天，到期自动清除；共用电脑建议不勾选；</li>
+          <li>关闭面板：点遮罩空白处或底部「关闭」都能退出。</li>
+        </ul>
+        <div class="doc-tip">账单与清单不上云，换电脑前仍要按第 05 节导出汇总；配置在登录后会自动同步。</div>
+      </div>
+    
+        </div>
       </div>
     </div>
 
@@ -2536,6 +2653,28 @@ function mtCloudPush(key){
     <div class="sub-header-line">
       <div class="yellow-mark"></div>
       <span>小优化·大不同</span>
+    </div>
+
+    <div class="log-item">
+      <div class="log-date"><b>11/20</b>2026</div>
+      <div class="log-rail" aria-hidden="true"></div>
+      <div class="log-body">
+        <h3>登录交互与动效升级<span class="log-tag">交互优化</span></h3>
+        <ul>
+          <li>登录弹窗交互调整：移除页面加载自动弹出逻辑，改为点击右上角「登录」按钮唤起登录面板（登录成功后入口换成头像）。</li>
+          <li>动画体验统一优化：登录成功、手动关闭弹窗复用同一套缩放退场动画；做反馈区分，仅登录成功时触发头像回弹动效。</li>
+          <li>登录面板关闭方式统一为点击遮罩空白处与底部「关闭」，取消右上角关闭按钮。</li>
+          <li>Bug修复：解决登录框被样式覆盖导致面板透明不可见、频繁快速开关弹窗引发动画状态错乱、首页初始化 title 标题闪烁三类问题。</li>
+          <li>登录逻辑优化：账号密码校验失败时不再自动关闭弹窗，保留用户已输入内容并展示红色错误提示。</li>
+          <li>代码优化：清理 CSS 中重复的动画 keyframes，删减冗余样式代码。</li>
+          <li>排版修复：使用说明的列表继承了根字号（16px），44em 算出的宽度比正文段落多出约 130px，导致列表右边界与段落对不齐；列表改为显式 13px，段落、列表、提示条统一列宽。</li>
+          <li>文档脱敏：使用说明与代码注释中暴露公司组织架构的真实路径示例（如「硬件工程系统/产品开发中心/…」）改为通用层级描述，只保留规则说明。</li>
+          <li>使用说明双栏微调：导语收进正文列、目录与导语首行顶对齐，不再出现正文最后一行压到目录的情况。</li>
+          <li>使用说明改双栏：正文放宽到 760px，右侧新增常驻目录（滚动跟随、点击定位），解决正文挤在左侧、右边大片留白的问题；900px 以下自动回退为原来的横向目录。</li>
+          <li>功能调整：站点 favicon 替换为 base64 内联图标；记住密码存储设置为 7 天有效期，取消永久本地存储，过期自动清理数据。</li>
+          <li>使用说明补充「登录与同步」章节，两个工具各自独立成章：巡查台账讲同步配置与清单，快递月结讲仅同步配置、账单与清单只在本地，并分别说明登录入口、记住密码 7 天时效与报错提示。</li>
+        </ul>
+      </div>
     </div>
 
     <div class="log-item">
@@ -3700,10 +3839,9 @@ function deptPathSegs(v) {
 }
 
 /* 逐级截头匹配：先用完整路径，再依次砍掉最前面一级，用剩余路径去比对映射路径的末尾。
-   例：OPPO公司/硬件工程系统/产品开发中心/产品开发二部/射频组
-   → 硬件工程系统/产品开发中心/产品开发二部/射频组
-   → 产品开发中心/产品开发二部/射频组
-   → 产品开发二部/射频组（最后一轮保留两级，不再往下砍，避免只按单个组名乱配）
+   例：一级单位/二级中心/三级部门/四级小组
+   → 二级中心/三级部门/四级小组
+   → 三级部门/四级小组（最后一轮保留两级，不再往下砍，避免只按单个组名乱配）
    返回 { dept, dropped, ambiguous }：dropped 表示砍掉了几级 */
 function findDeptByPath(v) {
   var raw = deepClean(v);
@@ -6558,8 +6696,34 @@ window.EXPRESS = {
   }
   window.mtToast = toast;
 
-  function openMask(m){ m.classList.add("open"); }
-  function closeMask(m){ m.classList.remove("open"); }
+  /* 动画状态锁：同一时间只放行一次开 / 关动画，避免快速连点把类名状态打乱 */
+  var animLock = false, ANIM_MS = 220;
+  function openMask(m){
+    if (!m || animLock) return;
+    m.classList.remove("closing");
+    m.classList.add("open");
+  }
+  /* 关闭：与登录成功共用同一套原地缩放退场；done 在该弹窗动画结束后执行 */
+  function closeMask(m, done){
+    if (!m || animLock) return;
+    if (!m.classList.contains("open") && !m.classList.contains("closing")) return;
+    animLock = true;
+    m.classList.add("closing");
+    m.classList.remove("open");
+    setTimeout(function(){
+      m.classList.remove("closing");
+      animLock = false;
+      if (typeof done === "function") done();
+    }, ANIM_MS);
+  }
+  /* 头像回弹：只在登录成功、弹窗淡出之后触发一次 */
+  function avatarPop(){
+    if (!avatar) return;
+    avatar.classList.remove("pop");
+    void avatar.offsetWidth;
+    avatar.classList.add("pop");
+    setTimeout(function(){ avatar.classList.remove("pop"); }, 460);
+  }
   function err(el, msg){
     if (!msg){ el.textContent = ""; el.classList.remove("on"); return; }
     el.textContent = msg; el.classList.add("on");
@@ -6579,27 +6743,36 @@ window.EXPRESS = {
 
   /* ---------- 记住密码 ---------- */
   var REM_KEY = "mt_remember_v1";
+  var REM_MS  = 7 * 24 * 60 * 60 * 1000;   /* 记住密码有效期：7 天 */
   var remBox = $("mtRemember");
   function remSave(email, pwd){
     try{
       localStorage.setItem(REM_KEY, JSON.stringify({
         e: email,
-        p: btoa(encodeURIComponent(pwd))
+        p: btoa(encodeURIComponent(pwd)),
+        t: Date.now(),
+        exp: Date.now() + REM_MS
       }));
     }catch(e2){}
   }
   function remClear(){
     try{ localStorage.removeItem(REM_KEY); }catch(e2){}
   }
+  /* 读取时先校验时效：过 7 天、或旧版没写时效的记录，一律清掉不再回填 */
   function remLoad(){
     var raw = null;
     try{ raw = localStorage.getItem(REM_KEY); }catch(e2){}
     if (!raw){ remBox.checked = false; return; }
     var o = null;
     try{ o = JSON.parse(raw); }catch(e2){ o = null; }
-    if (!o || !o.e){ remClear(); remBox.checked = false; return; }
+    var expired = true;
+    if (o && o.e && typeof o.exp === "number"){
+      expired = (Date.now() >= o.exp);
+    }
+    if (expired){ remClear(); remBox.checked = false; return; }
     var pwd = "";
     try{ pwd = decodeURIComponent(atob(o.p || "")); }catch(e2){ pwd = ""; }
+    /* 回填后按剩余时间续算，不自动延长 */
     $("mtEmail").value = o.e;
     $("mtPassword").value = pwd;
     remBox.checked = true;
@@ -6614,7 +6787,8 @@ window.EXPRESS = {
     if (e0 && p0) remSave(e0, p0);
   });
 
-  $("mtLoginTrigger").onclick = function(){
+  /* 打开登录面板：不再页面载入自动弹出，只在点右上角头像（或旧文字按钮）时唤起 */
+  function openLogin(){
     err(loginErr, "");
     $("mtEmailBox").classList.remove("bad");
     $("mtPwdBox").classList.remove("bad");
@@ -6626,8 +6800,9 @@ window.EXPRESS = {
         if (remBox.checked) $("mtLoginSubmit").focus();
         else $("mtEmail").focus();
       }catch(e){}
-    }, 220);
-  };
+    }, 240);
+  }
+  $("mtLoginTrigger").onclick = openLogin;
 
   /* ---------- 头像 ---------- */
   function initial(name){
@@ -6636,7 +6811,7 @@ window.EXPRESS = {
   }
   function paintAvatar(){
     avatar.textContent = initial(mtNickname);
-    avatar.title = mtNickname;
+    avatar.title = mtUid ? mtNickname : "点击登录";
   }
 
   /* ---------- 登录 ---------- */
@@ -6686,7 +6861,8 @@ window.EXPRESS = {
       /* 登录成功：按勾选状态保存 / 清除凭据 */
       if (remBox.checked) remSave(email, pwd); else remClear();
       $("mtPassword").value = "";
-      closeMask(maskLogin);
+      /* 登录成功：与手动关闭共用同一套缩放退场，唯一区别是退场结束后头像回弹一次 */
+      closeMask(maskLogin, avatarPop);
     }).catch(function(e){
       busy = false;
       btn.disabled = false; btn.textContent = "登录";
@@ -6701,6 +6877,7 @@ window.EXPRESS = {
   /* ---------- 下拉 ---------- */
   $("mtAvatarTrigger").onclick = function(e){
     e.stopPropagation();
+    if (!mtUid){ dd.classList.remove("open"); openLogin(); return; }
     dd.classList.toggle("open");
   };
   document.addEventListener("click", function(e){
@@ -6872,6 +7049,7 @@ window.EXPRESS = {
     mtUid = null; mtEmail = ""; mtReady = false;
     $("mtLoginTrigger").style.display = "";
     $("mtAvatarWrap").style.display = "none";
+    if (avatar){ avatar.textContent = "管"; avatar.title = "点击登录"; }
     dd.classList.remove("open");
     setDdState();
   }
@@ -6942,3 +7120,4 @@ window.EXPRESS = {
 </script>
 </body>
 </html>
+<!-- （注：内容由AI生成） -->
