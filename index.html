@@ -26,6 +26,21 @@
         --shadow-1: 0 1px 2px rgba(0,0,0,.04), 0 1px 1px rgba(0,0,0,.03);
         --shadow-2: 0 2px 8px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.05);
 
+        /* 层级总表：所有 z-index 统一从这里取，避免各处硬写数字打架 */
+        --z-nav: 80;              /* 顶部导航 */
+        --z-dropdown: 100;        /* 导航与登录下拉 */
+        --z-toast: 120;           /* 通用轻提示 */
+        --z-auth: 130;            /* 登录 / 账号弹窗 */
+        --z-mask: 99;             /* 页面级弹窗遮罩 */
+        --z-dlg-edit: 10050;      /* 快递月结：编辑映射 */
+        --z-dlg-bind: 10055;      /* 快递月结：绑定部门 */
+        --z-dlg-add: 10058;       /* 快递月结：新增部门 */
+        --z-dlg-warn: 10060;      /* 快递月结：警告 */
+        --z-dlg-bkmode: 10065;    /* 快递月结：备份模式 */
+        --z-pop-dep: 10070;       /* 快递月结：部门选择浮层 / 导入报告 */
+        --z-toast-top: 9999;      /* 快递月结：顶部提示 */
+        --z-tip-bottom: 99999;    /* 快递月结：底部兜底提示 */
+
         /* Transitions.dev — Modal open / close */
         --modal-open-dur: 250ms;
         --modal-close-dur: 150ms;
@@ -41,7 +56,7 @@
     /* 固定预留滚动条占位：切到内容更矮的页面时滚动条消失，可视宽度会突变，
        居中的导航、LOGO 会整体横移；这里始终保留滚动条槽位，宽度恒定 */
     html {
-        overflow-y: scroll;
+        overflow-y: auto;
         scrollbar-gutter: stable;
     }
     body {
@@ -303,6 +318,8 @@
         --in-y: 8px;
         animation: fadeUpIn 0.5s ease-out;
     }
+    /* v1.96：表格入场动画只在首次加载播一次，之后查询/翻页/增删导致的重建都不再重播 */
+    html.calm-table table { animation: none; }
     
     th,
     td {
@@ -343,14 +360,20 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 99;
+        z-index: var(--z-mask);
         opacity:0;
         pointer-events:none;
-        transition: opacity var(--modal-open-dur) ease;
+        /* 隐藏时必须彻底退出渲染与命中测试：只靠 opacity + pointer-events 不够，
+           内部若有用 pointer-events:auto / visibility:visible 恢复交互的子元素，
+           会出现「看不见但点得到」的穿透。visibility 在淡出结束后才切 */
+        visibility:hidden;
+        transition: opacity var(--modal-open-dur) ease, visibility 0s linear var(--modal-close-dur);
     }
     .modal-mask.is-show{
         opacity:1;
         pointer-events:auto;
+        visibility:visible;
+        transition: opacity var(--modal-open-dur) ease, visibility 0s linear 0s;
     }
 
     /* Transitions.dev t-modal 弹窗缩放动画 */
@@ -632,34 +655,7 @@
     }
     .pl-saved.show {
         opacity: 1;
-    }
-    /* 板块卡片：只保留标题与操作，风格紧凑 */
-    .cfg-plate-card {
-        border: 1px solid var(--min-line);
-        border-radius: var(--min-radius);
-        padding: 14px 16px;
-        margin: 10px 0;
-        background: var(--min-white);
-        box-shadow: var(--shadow-1);
-        transition: box-shadow 0.18s ease, border-color 0.18s ease;
-    }
-    .cfg-plate-card:hover {
-        box-shadow: var(--shadow-2);
-        border-color: #ddd;
-    }
-    .cfg-plate-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-    .cfg-plate-head .p-name {
-        font-weight: 700;
-        letter-spacing: 2px;
-        font-size: 14px;
-    }
-    /* 新增板块弹窗表单 */
+    }    /* 新增板块弹窗表单 */
     .np-modal .np-form {
         padding: 4px 2px 0;
     }
@@ -747,24 +743,7 @@
         outline: none;
         box-shadow: var(--shadow-1);
         resize: vertical;
-    }
-    .sub-item {
-        padding: 12px;
-        border: 1px solid var(--min-line);
-        border-radius: var(--min-radius);
-        margin: 10px 0;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-        background: var(--min-white);
-        box-shadow: var(--shadow-1);
-        transition: all 0.18s ease;
-    }
-    .sub-item:hover {
-        box-shadow: var(--shadow-2);
-    }
-    hr {
+    }    hr {
         border: none;
         border-top: 1px solid var(--min-line);
         margin: 16px 0;
@@ -815,7 +794,7 @@
     .site-nav {
         position: sticky;
         top: 0;
-        z-index: 80;
+        z-index: var(--z-nav);
         background: var(--min-white);
         border-bottom: 1px solid var(--min-line);
         transition: box-shadow .25s ease, border-color .25s ease;
@@ -891,17 +870,20 @@
         position: absolute;
         left: 0;
         bottom: 3px;
-        width: 0;
+        width: 1px;                 /* 宽度固定 1px，实际长度靠 scaleX 拉伸 */
         height: 2px;
         background: var(--min-black);
         pointer-events: none;
         z-index: 0;
         opacity: 0;
+        transform-origin: left center;
+        transform: translateX(0) scaleX(0);
+        will-change: transform;
     }
     .nav-indicator.is-ready {
         opacity: 1;
-        transition: left .26s cubic-bezier(.4, 0, .2, 1),
-                    width .26s cubic-bezier(.4, 0, .2, 1);
+        /* 只动 transform：走合成层，不再触发布局重排 */
+        transition: transform .26s cubic-bezier(.4, 0, .2, 1);
     }
     .site-links::-webkit-scrollbar {
         display: none;
@@ -1019,158 +1001,6 @@
         line-height: 1.9;
         color: var(--min-gray);
         max-width: 572px;
-    }
-    .sec-line {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        border-bottom: 1px solid var(--min-black);
-        padding-bottom: 10px;
-        margin-top: 32px;
-    }
-    .sec-line h3 {
-        font-size: 15px;
-        font-weight: 700;
-        letter-spacing: 3px;
-        color: var(--min-black);
-    }
-    .sec-line .note {
-        font-size: 11px;
-        color: var(--min-light);
-        letter-spacing: 1px;
-    }
-    .entry-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 16px 4px;
-        border-bottom: 1px solid var(--min-line);
-        text-decoration: none;
-        color: var(--min-dark);
-        transition: background 0.18s ease, padding 0.18s ease;
-    }
-    .entry-row:hover {
-        background: var(--min-tag);
-        padding-left: 12px;
-    }
-    .entry-row:focus-visible {
-        outline: 2px solid var(--min-black);
-        outline-offset: -2px;
-    }
-    .entry-row .er-l {
-        display: flex;
-        align-items: baseline;
-        gap: 14px;
-        min-width: 0;
-    }
-    .entry-row .er-n {
-        font-size: 11px;
-        color: var(--min-light);
-        letter-spacing: 1px;
-        flex: none;
-    }
-    .entry-row .er-t {
-        font-size: 15px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        color: var(--min-black);
-        white-space: nowrap;
-    }
-    .entry-row .er-d {
-        font-size: 12px;
-        color: var(--min-gray);
-        margin-top: 3px;
-    }
-    .entry-row .er-go {
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 1px;
-        color: var(--min-gray);
-        flex: none;
-    }
-    .stats {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1px;
-        background: var(--min-line);
-        border: 1px solid var(--min-line);
-        border-radius: var(--min-radius);
-        overflow: hidden;
-        margin-top: 16px;
-    }
-    .stat {
-        background: var(--min-white);
-        padding: 16px 14px 14px;
-    }
-    .stat .sn {
-        font-size: 22px;
-        font-weight: 700;
-        color: var(--min-black);
-        letter-spacing: 1px;
-        line-height: 1.2;
-    }
-    .stat .sn.sm {
-        font-size: 12px;
-        color: var(--min-gray);
-        padding-top: 7px;
-        letter-spacing: 0;
-        line-height: 1.5;
-    }
-    .stat .sl {
-        font-size: 11px;
-        color: var(--min-light);
-        letter-spacing: 2px;
-        margin-top: 6px;
-    }
-    @media (min-width: 720px) {
-        .stats {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
-    .steps {
-        display: grid;
-        grid-template-columns: 1fr;
-        border-top: 1px solid var(--min-line);
-    }
-    .step {
-        padding: 16px 0;
-        border-bottom: 1px solid var(--min-line);
-    }
-    .step .st-n {
-        font-size: 11px;
-        color: var(--min-light);
-        letter-spacing: 2px;
-    }
-    .step .st-t {
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        color: var(--min-black);
-        margin-top: 6px;
-    }
-    .step .st-d {
-        font-size: 12px;
-        line-height: 1.85;
-        color: var(--min-gray);
-        margin-top: 6px;
-    }
-    @media (min-width: 720px) {
-        .steps {
-            grid-template-columns: repeat(3, 1fr);
-        }
-        .step {
-            border-bottom: none;
-            padding: 16px 20px 16px 0;
-        }
-        .step:first-child {
-            padding-left: 0;
-        }
-        .step + .step {
-            border-left: 1px solid var(--min-line);
-            padding-left: 20px;
-        }
     }
     .doc-entry {
         padding: 22px 0;
@@ -1628,24 +1458,7 @@
 #tool-express .stat-card .val{font-size:18px;font-weight:700;margin-top:4px;color:var(--min-black);}
 @media (max-width:900px){
     #tool-express .stat-wrap .stat-card{flex:1 1 calc(50% - 6px);min-width:0;}
-}
-
-/* 折叠面板 */
-#tool-express .collapse-wrap{
-    border:1px solid var(--min-line);border-radius:var(--min-radius);
-    background:var(--min-bg);box-shadow:var(--shadow-1);margin:16px 0;
-}
-#tool-express .collapse-head{
-    padding:14px 18px;display:flex;justify-content:space-between;align-items:center;
-    cursor:pointer;font-weight:700;letter-spacing:2px;user-select:none;
-}
-#tool-express .collapse-body{
-    padding:0 18px 18px;overflow:hidden;max-height:0;
-    transition:max-height .32s ease;
-}
-#tool-express .collapse-body.open{max-height:1200px;}
-
-/* 页签 */
+}/* 页签 */
 #tool-express .tab-bar{
     display:flex;gap:10px;margin:14px 0 4px;
     justify-content:space-between;align-items:center;flex-wrap:wrap;
@@ -1655,23 +1468,17 @@
     -webkit-overflow-scrolling:touch;
 }
 #tool-express .tab-item{
-    padding:9px 16px;border:1px solid var(--min-line);
-    border-radius:var(--min-radius) var(--min-radius) 0 0;
-    background:var(--min-tag);cursor:pointer;font-size:13px;font-weight:600;letter-spacing:1px;
+    padding:8px 14px;border:1px solid var(--min-line);
+    border-radius:6px;
+    background:var(--min-tag);cursor:pointer;font-size:13px;font-weight:600;
+    transition:background-color .25s ease,color .25s ease,border-color .25s ease;
 }
-#tool-express .tab-item.active{background:var(--min-white);border-bottom-color:var(--min-white);}
-#tool-express .tab-panel{display:none;}
-#tool-express .tab-panel.active{display:block;}
-
-/* 弹窗：模块弹窗尺寸更大，并保留自身入场动画
-   遮罩必须显式覆盖站点 .modal-mask 的隐藏态（opacity:0 / pointer-events:none），否则弹窗会“闪退” */
-#tool-express .modal-mask{
-    position:fixed;inset:0;background:rgba(0,0,0,.30);display:none;
-    align-items:center;justify-content:center;z-index:99;
-    opacity:1;pointer-events:auto;transition:none;
-    animation:maskIn .18s ease-out;
+/* 选中态与配置页页签完全一致：黑底白字 */
+#tool-express .tab-item.active{
+    background:var(--min-black);color:var(--min-white);border-color:var(--min-black);
 }
-@keyframes maskIn{from{opacity:0;}to{opacity:1;}}
+/* 弹窗：模块弹窗尺寸更大，并保留自身入场动画；
+   遮罩沿用全局 .modal-mask 的 opacity 方案（打开淡入、关闭淡出），不再单独覆盖 display */
 #tool-express .modal{
     background:var(--min-white);border:1px solid var(--min-line);
     border-radius:var(--min-radius);box-shadow:var(--shadow-2);
@@ -1728,12 +1535,7 @@
 #tool-express .hide{display:none!important;}
 #tool-express .muted{color:var(--min-gray);}
 #tool-express .file-info{font-size:12px;color:var(--min-gray);margin-top:10px;}
-#tool-express .editable-tip{font-size:12px;color:var(--min-gray);margin:8px 0 0;}
-#tool-express .col-hint{font-size:12px;color:var(--min-gray);}
-
-/* 提示条 */
-#tool-express .warn-text{color:#c82423;font-weight:600;}
-#tool-express .warn-file{color:var(--min-dark);margin-bottom:6px;}
+#tool-express .editable-tip{font-size:12px;color:var(--min-gray);margin:8px 0 0;}#tool-express .warn-file{color:var(--min-dark);margin-bottom:6px;}
 #tool-express .warn-line{margin:4px 0;font-size:13px;}
 #tool-express .warn-line.danger{color:#c0392b;}
 #tool-express .warn-line.muted{color:var(--min-gray);}
@@ -1759,6 +1561,34 @@
 #tool-express .scroll-rows6::-webkit-scrollbar-thumb{background:#dedede;border-radius:4px;}
 #tool-express .scroll-rows6:hover::-webkit-scrollbar-thumb{background:#c2c2c2;}
 #tool-express .scroll-rows6.has-more{box-shadow:inset 0 -14px 14px -12px rgba(0,0,0,.14);}
+/* v1.94：设置弹窗容器固定高度，面板叠层淡入切换；表格补占位行撑满，页面不再随页签上下抖动 */
+#tool-express .set-body{
+    position:relative;overflow:hidden;
+}
+#tool-express .set-pane{
+    position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;
+    overflow-y:auto;overflow-x:hidden;
+    opacity:0;visibility:hidden;transform:translateY(8px);
+    transition:opacity .28s cubic-bezier(.22,1,.36,1),transform .28s cubic-bezier(.22,1,.36,1);
+}
+/* 交互权限只由遮罩统一控制：不再在页签上单独 pointer-events:auto，
+   否则遮罩隐藏时页签内的按钮仍能被命中（点配置却触发了下载模板） */
+#tool-express .set-pane.pane-in{opacity:1;visibility:visible;transform:translateY(0);}
+/* 占位行：跟数据行长得一模一样，只负责把表格撑满，肉眼分不出来 */
+#tool-express .preview-table tr.ph-row td{color:transparent;}
+/* 人员映射新增行的部门下拉：尺寸与同一行输入框对齐 */
+#tool-express .set-body .dp-wrap.pick-manual-new{flex:1 1 0;min-width:200px;max-width:100%;}
+#tool-express .set-body .dp-wrap.pick-manual-new .dp-btn{
+    min-height:36px;padding:4px 10px;
+    font-size:14px;font-weight:400;letter-spacing:normal;line-height:1.35;
+    color:var(--min-dark);border-radius:var(--min-radius);
+    box-shadow:var(--shadow-1);
+}
+@media (prefers-reduced-motion: reduce){
+    #tool-express .set-pane{
+        transition:none!important;transform:none!important;
+    }
+}
 
 /* 分组 / 汇总 */
 #tool-express .group-title{
@@ -1778,8 +1608,6 @@
 #tool-express .summary-box .sm-title{font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:8px;}
 #tool-express .summary-box .sm-main{font-size:16px;line-height:1.9;}
 #tool-express .summary-box .sm-main b{font-size:20px;}
-#tool-express .summary-box .sm-sub{font-size:13px;color:var(--min-gray);margin-top:6px;line-height:1.9;}
-
 /* 自定义下拉（dp-*）：模块独有的浮层组件 */
 #tool-express .dp-wrap{position:relative;min-width:150px;}
 #tool-express .dp-btn{
@@ -1792,7 +1620,7 @@
 #tool-express .dp-ph{color:#999;}
 #tool-express .dp-arrow{color:#999;font-size:11px;flex:0 0 auto;}
 #tool-express .dp-panel{
-    position:fixed;z-index:10070;background:#fff;border:1px solid var(--min-line);
+    position:fixed;z-index:var(--z-pop-dep);background:#fff;border:1px solid var(--min-line);
     border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;box-sizing:border-box;
 }
 #tool-express .dp-search{
@@ -1808,14 +1636,7 @@
 #tool-express .dp-item:hover{background:#f4f4f4;}
 #tool-express .dp-item.active{background:#efefef;}
 #tool-express .dp-name{font-size:12px;color:#222;line-height:1.4;}
-#tool-express .dp-empty{padding:10px 8px;font-size:12px;color:#999;}
-
-/* 行内小控件 */
-#tool-express .row-select{
-    padding:4px 6px;font-size:12px;border-radius:6px;
-    border:1px solid var(--min-line);background:var(--min-white);
-}
-#tool-express .op-btn{
+#tool-express .dp-empty{padding:10px 8px;font-size:12px;color:#999;}#tool-express .op-btn{
     padding:4px 10px;font-size:12px;border-radius:6px;
     border:1px solid var(--min-line);background:var(--min-tag);cursor:pointer;font-weight:600;
 }
@@ -1823,6 +1644,21 @@
 #tool-express .op-btn.op-primary{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
 #tool-express .op-btn.op-primary:hover{opacity:.85;}
 #tool-express .cell-ops{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap;}
+/* v1.92：清单里的工号 / 姓名保持单行，姓名不换行 */
+#tool-express #resultTable th.rc-no, #tool-express #resultTable td.rc-no{
+    width:88px;white-space:nowrap;
+}
+#tool-express #resultTable th.rc-name, #tool-express #resultTable td.rc-name{
+    width:78px;white-space:nowrap;
+}
+/* 结果清单表头随表格滚动吸附在顶部（滚动容器是外层 .scroll） */
+/* 去掉 table 自带的 overflow:hidden：它会把 sticky 表头锁在表格内部，滚动后照样被滚走 */
+#tool-express #resultTable{overflow:visible;}
+#tool-express #resultTable thead th{
+    position:sticky;top:0;z-index:2;
+    background:var(--min-tag);
+    box-shadow:inset 0 -1px 0 var(--min-line);
+}
 
 /* 操作条 / 搜索框 */
 #tool-express .action-bar{
@@ -1859,14 +1695,6 @@
     border-radius:6px;background:var(--min-tag);cursor:pointer;font-weight:600;
 }
 #tool-express .set-tab.active{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
-#tool-express .kw-list{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
-#tool-express .kw-chip{
-    display:inline-flex;align-items:center;gap:6px;padding:5px 10px;
-    border:1px solid var(--min-line);border-radius:16px;
-    background:var(--min-white);font-size:13px;
-}
-#tool-express .kw-chip button{border:none;background:none;cursor:pointer;color:#c82423;font-weight:700;}
-
 @media (max-width:768px){
     #tool-express .modal{min-width:0!important;width:100%;max-width:100%;padding:18px;}
     #tool-express .modal-mask{padding:12px;}
@@ -1992,7 +1820,7 @@
 .mt-dot{position:absolute;right:2px;bottom:2px;width:8px;height:8px;border-radius:50%;background:#27ae60;border:1.5px solid #fff;display:none}
 .mt-dot.off{background:#c9c9c9}
 .mt-dot.on{display:block}
-.mt-dd{position:absolute;right:0;top:46px;width:236px;background:#fff;border:1px solid var(--min-line);border-radius:8px;box-shadow:var(--shadow-2);padding:6px;display:none;z-index:100}
+.mt-dd{position:absolute;right:0;top:46px;width:236px;background:#fff;border:1px solid var(--min-line);border-radius:8px;box-shadow:var(--shadow-2);padding:6px;display:none;z-index:var(--z-dropdown)}
 .mt-dd.open{display:block}
 .mt-dd-head{padding:9px 10px 9px;border-bottom:1px solid var(--min-line);margin-bottom:5px}
 .mt-dd-mail{font-size:12px;color:var(--min-gray);word-break:break-all;line-height:1.4}
@@ -2004,7 +1832,7 @@
 /* 遮罩：始终 display:flex，靠 opacity + visibility 过渡，淡入、淡出都能正常播放
    （display:none ↔ flex 的瞬切会让 transition 失效，表现为直接闪现 / 消失） */
 .mt-mask{
-  position:fixed;inset:0;z-index:130;padding:24px;
+  position:fixed;inset:0;z-index:var(--z-auth);padding:24px;
   background:rgba(20,20,20,.30);
   -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
   display:flex;align-items:center;justify-content:center;
@@ -2083,7 +1911,7 @@
 .mt-btn:disabled{background:#555;cursor:not-allowed}
 .mt-cancel{display:block;text-align:center;margin-top:18px;font-size:13px;color:var(--min-gray);cursor:pointer;transition:color .16s ease}
 .mt-cancel:hover{color:var(--min-black)}
-.mt-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:rgba(17,17,17,.93);color:#fff;font-size:13px;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;z-index:120;max-width:82vw;text-align:center;line-height:1.5}
+.mt-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:rgba(17,17,17,.93);color:#fff;font-size:13px;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;z-index:var(--z-toast);max-width:82vw;text-align:center;line-height:1.5}
 .mt-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media (max-width:768px){
@@ -2179,9 +2007,9 @@ function mtCloudPush(key){
       <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
     </div>
     <div class="mt-user" id="mtUser">
-      <button type="button" class="mt-login-btn" id="mtLoginTrigger">登录</button>
+      <button  class="mt-login-btn" id="mtLoginTrigger">登录</button>
       <div class="mt-avatar-wrap" id="mtAvatarWrap">
-        <button type="button" class="mt-avatar-btn" id="mtAvatarTrigger">
+        <button  class="mt-avatar-btn" id="mtAvatarTrigger">
           <span class="mt-avatar" id="mtAvatar">管</span>
           <span class="mt-dot" id="mtDot"></span>
         </button>
@@ -2223,8 +2051,8 @@ function mtCloudPush(key){
 <section class="view" id="view-tools" hidden>
 <div class="tool-switch">
   <div class="ts-left">
-    <button type="button" class="tool-tab active" data-tool-tab="archive" onclick="switchTool('archive')">巡查台账</button>
-    <button type="button" class="tool-tab" data-tool-tab="express" onclick="switchTool('express')">快递月结</button>
+    <button  class="tool-tab active" data-tool-tab="archive" onclick="switchTool('archive')">巡查台账</button>
+    <button  class="tool-tab" data-tool-tab="express" onclick="switchTool('express')">快递月结</button>
   </div>
   <a class="ts-doc" id="toolDocLink" href="#/docs?doc=archive">查看该工具使用说明</a>
 </div>
@@ -2409,6 +2237,11 @@ function mtCloudPush(key){
 <!-- 板块编辑弹窗 -->
 </div>
 <div id="tool-express" hidden>
+  <!-- v1.90：部门选择浮层提到工具根层，设置弹窗里也能用，不再被结果区的隐藏状态影响 -->
+  <div id="deptPickPanel" class="dp-panel" style="display:none;">
+    <input id="deptPickSearch" class="dp-search" placeholder="搜索部门名称或编码" oninput="EXPRESS.filterDeptPick()">
+    <div id="deptPickList" class="dp-list"></div>
+  </div>
 <div class="container">
   <div class="color-bar"></div>
   <div class="header">
@@ -2446,7 +2279,7 @@ function mtCloudPush(key){
   <div class="action-bar">
     <button class="primary" onclick="EXPRESS.doMatch()">开始识别匹配</button>
     <button class="success hide" id="btnExport" onclick="EXPRESS.exportExcel()">导出汇总 Excel</button>
-    <button class="success" onclick="EXPRESS.openSettings()">设置</button>
+    <button class="success" onclick="try{EXPRESS.openSettings()}catch(e){alert('配置面板打开失败：'+e.message)}">配置</button>
     <div class="spacer"></div>
   </div>
 
@@ -2460,10 +2293,6 @@ function mtCloudPush(key){
     </div>
     <div class="banner-check" id="eqBanner"></div>
     <div class="stat-wrap" id="statBox"></div>
-    <div id="deptPickPanel" class="dp-panel" style="display:none;">
-      <input id="deptPickSearch" class="dp-search" placeholder="搜索部门名称或编码" oninput="EXPRESS.filterDeptPick()">
-      <div id="deptPickList" class="dp-list"></div>
-    </div>
     <div class="tab-bar" id="resultTabBar">
       <div class="tabs-left">
         <div class="tab-item active" data-tab="sum" onclick="EXPRESS.switchTab('sum')">部门汇总</div>
@@ -2473,7 +2302,7 @@ function mtCloudPush(key){
         <div class="tab-item" data-tab="search" onclick="EXPRESS.switchTab('search')">搜索结果</div>
       </div>
       <div class="tabs-right">
-        <button type="button" class="op-btn op-primary" id="btnApplySug" onclick="EXPRESS.applyAllSuggested()" style="display:none;">按预选批量归入</button>
+        <button  class="op-btn op-primary" id="btnApplySug" onclick="EXPRESS.applyAllSuggested()" style="display:none;">按预选批量归入</button>
       </div>
     </div>
     <div class="scroll">
@@ -2487,7 +2316,7 @@ function mtCloudPush(key){
 </div>
 
 
-<div class="modal-mask" id="modalEditMap" style="z-index:10050;">
+<div class="modal-mask" id="modalEditMap" style="z-index:var(--z-dlg-edit);">
   <div class="modal" style="min-width:0;width:440px;max-width:92vw;">
     <h3>编辑人员映射</h3>
     <div class="field-row" style="flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:12px;">
@@ -2505,7 +2334,7 @@ function mtCloudPush(key){
   </div>
 </div>
 
-<div class="modal-mask" id="modalBkMode" style="z-index:10065;">
+<div class="modal-mask" id="modalBkMode" style="z-index:var(--z-dlg-bkmode);">
   <div class="modal" style="min-width:0;width:560px;max-width:92vw;">
     <h3>如何导入这份备份</h3>
     <div id="bkModeBody" style="line-height:1.95;font-size:14px;"></div>
@@ -2517,7 +2346,7 @@ function mtCloudPush(key){
   </div>
 </div>
 
-<div class="modal-mask" id="modalBindDept" style="z-index:10055;">
+<div class="modal-mask" id="modalBindDept" style="z-index:var(--z-dlg-bind);">
   <div class="modal" style="min-width:0;width:620px;max-width:92vw;">
     <h3>是否为该员工绑定部门</h3>
     <div id="bindDeptBody" style="line-height:1.95;font-size:14px;"></div>
@@ -2530,7 +2359,7 @@ function mtCloudPush(key){
   </div>
 </div>
 
-<div class="modal-mask" id="modalAddDept" style="z-index:10058;">
+<div class="modal-mask" id="modalAddDept" style="z-index:var(--z-dlg-add);">
   <div class="modal" style="min-width:0;width:620px;max-width:92vw;">
     <h3>是否绑定部门</h3>
     <div id="addDeptBody" style="line-height:1.9;font-size:14px;"></div>
@@ -2541,7 +2370,7 @@ function mtCloudPush(key){
   </div>
 </div>
 
-<div class="modal-mask" id="modalWarn" style="z-index:10060;">
+<div class="modal-mask" id="modalWarn" style="z-index:var(--z-dlg-warn);">
   <div class="modal" style="min-width:460px;max-width:640px;">
     <h3 id="warnTitle">表头校验未通过</h3>
     <div id="warnBody" style="line-height:1.9;"></div>
@@ -2553,16 +2382,17 @@ function mtCloudPush(key){
 </div>
 <div class="modal-mask" id="modalSettings">
   <div class="modal set-modal" style="min-width:0;width:min(1100px,94vw);max-width:94vw;">
-    <h3>设置</h3>
+    <h3>配置</h3>
     <div class="set-tabs">
       <div class="set-tab active" data-set="dept" onclick="EXPRESS.setTab('dept')">部门映射</div>
       <div class="set-tab" data-set="manual" onclick="EXPRESS.setTab('manual')">人员映射</div>
-      <div class="set-tab" data-set="fields" onclick="EXPRESS.setTab('fields')">字段识别</div>
       <div class="set-tab" data-set="rules" onclick="EXPRESS.setTab('rules')">人员类型</div>
+      <div class="set-tab" data-set="fields" onclick="EXPRESS.setTab('fields')">字段识别</div>
       <div class="set-tab" data-set="backup" onclick="EXPRESS.setTab('backup')">配置备份</div>
     </div>
 
-    <div id="setPaneDept">
+    <div id="setBody" class="set-body">
+    <div id="setPaneDept" class="set-pane">
       <div class="btn-group" style="align-items:center;margin-bottom:10px;">
         <input type="text" id="inpDeptSearch" placeholder="搜索：编码 / 行政组织名称 / 核算组织名称" style="flex:1 1 320px;" oninput="EXPRESS.onDeptSearch(this.value)">
         <span class="muted" id="deptSearchTip" style="font-size:12px;"></span>
@@ -2580,16 +2410,16 @@ function mtCloudPush(key){
         <input type="text" id="inpDeptAcct" placeholder="核算组织名称" style="flex:1 1 280px;min-width:240px;">
       </div>
       <div class="btn-group" style="align-items:center;flex-wrap:wrap;">
-        <button class="primary btn-mini" id="btnDeptSave" onclick="EXPRESS.saveDeptItem()">新增</button>
-        <button class="info btn-mini" onclick="EXPRESS.resetDeptInput()">清空输入</button>
-        <button class="primary btn-mini" onclick="EXPRESS.pickDeptFile()">批量导入映射表</button>
+        <button class="primary btn-mini" id="btnDeptSave" onclick="EXPRESS.saveDeptItem()">添加映射</button>
+        <button class="primary btn-mini" onclick="EXPRESS.pickDeptFile()">导入映射</button>
         <button class="info btn-mini" onclick="EXPRESS.deptTemplate()">下载模板</button>
+        <button class="danger btn-mini" onclick="EXPRESS.clearDept()">清空数据</button>
         <input type="file" id="fileDeptImport" accept=".xlsx,.xls,.csv" style="display:none;" onchange="EXPRESS.importDeptFile(this)">
       </div>
       <div class="group-tip">支持 Excel / CSV，按「核算组织编码 / 行政组织名称 / 核算组织名称」三列识别，带不带表头都能读。导入是合并：同一「行政组织名称」更新内容，新路径追加，空行自动跳过；同一编码对应多个分部门会各自保留，不会互相覆盖。老的两列（编码+名称）文件也能导入，名称会同时当行政组织名称与核算组织名称。</div>
     </div>
 
-    <div id="setPaneManual" class="hide">
+    <div id="setPaneManual" class="set-pane">
       <div class="btn-group" style="align-items:center;margin-bottom:10px;">
         <input type="text" id="inpMapSearch" placeholder="搜索：工号 / 姓名 / 部门编码 / 部门名称" style="flex:1 1 320px;" oninput="EXPRESS.onMapSearch(this.value)">
         <span class="muted" id="mapSearchTip" style="font-size:12px;"></span>
@@ -2602,22 +2432,25 @@ function mtCloudPush(key){
       </div>
       <hr>
       <div class="btn-group" style="align-items:center;flex-wrap:wrap;margin-bottom:10px;">
-        <button class="primary btn-mini" onclick="EXPRESS.pickMapFile()">批量导入映射</button>
+        <input type="text" id="inpMapNo" placeholder="工号，例如 W1001" style="flex:1 1 0;min-width:160px;max-width:100%;">
+        <input type="text" id="inpMapName" placeholder="姓名（可不填）" style="flex:1 1 0;min-width:160px;max-width:100%;">
+        <div class="dp-wrap pick-manual-new" id="dpMapDept">
+          <button  class="dp-btn" onclick="EXPRESS.toggleDeptPick(this)">
+            <span class="dp-ph">搜索并选择部门</span> <span class="dp-arrow">▾</span>
+          </button>
+        </div>
+      </div>
+      <div class="btn-group" style="align-items:center;flex-wrap:wrap;">
+        <button class="primary btn-mini" onclick="EXPRESS.addManual()">添加映射</button>
+        <button class="primary btn-mini" onclick="EXPRESS.pickMapFile()">导入映射</button>
         <button class="info btn-mini" onclick="EXPRESS.mapTemplate()">下载模板</button>
         <button class="danger btn-mini" onclick="EXPRESS.clearManual()">清空数据</button>
         <input type="file" id="fileMapImport" accept=".xlsx,.xls,.csv" style="display:none;" onchange="EXPRESS.importMapFile(this)">
       </div>
-      <div class="btn-group" style="align-items:center;flex-wrap:wrap;">
-        <input type="text" id="inpMapNo" placeholder="工号，例如 W1001" style="width:180px;max-width:100%;">
-        <input type="text" id="inpMapName" placeholder="姓名（可不填）" style="width:180px;max-width:100%;">
-        <input type="text" id="mapDeptSearch" placeholder="搜索部门名称 / 编码" style="width:200px;max-width:100%;" oninput="EXPRESS.onMapDeptSearch(this.value)">
-        <select id="selMapDept" style="width:240px;max-width:100%;"></select>
-        <button class="primary btn-mini" onclick="EXPRESS.addManual()">添加映射</button>
-      </div>
       <div class="group-tip">新增的映射会立即对当前结果生效，并把该工号的未匹配记录转入有效统计。批量导入按「工号 / 姓名 / 部门编码」三列识别，部门编码要与部门映射里的核算组织编码一致。</div>
     </div>
 
-    <div id="setPaneFields" class="hide">
+    <div id="setPaneFields" class="set-pane">
       <div class="group-box">
         <div class="group-title">导入表结构（工作表与表头行）</div>
         <div class="field-row field-row-4">
@@ -2649,7 +2482,7 @@ function mtCloudPush(key){
       <div class="group-tip" id="fieldEmptyTip">提示：请先上传账单和花名册，列选项才会出现。</div>
     </div>
 
-    <div id="setPaneRules" class="hide">
+    <div id="setPaneRules" class="set-pane">
       <div class="group-title">工号类型规则（从上到下依次匹配，第一条命中即生效）</div>
       <div class="scroll scroll-rows6" id="rulesScroll">
         <table class="preview-table">
@@ -2675,7 +2508,7 @@ function mtCloudPush(key){
       <div class="group-tip">提示：默认不带任何规则，需要按贵司工号规则自己添加（例如「前缀 W → 外包」或「工号长度 8 → 内部员工」）。规则表从上到下依次判断、第一条命中即生效，所以前缀规则要排在长度规则前面。改动规则后需要重新点「开始识别匹配」才会重新分类。</div>
     </div>
 
-    <div id="setPaneBackup" class="hide">
+    <div id="setPaneBackup" class="set-pane">
       <div class="group-title">配置备份与恢复</div>
       <div class="group-tip" style="margin-bottom:12px;">一键导出会把「部门映射 + 人员映射 + 人员类型规则 + 字段识别（工作表与表头行）」整套打包成一个备份文件；用浏览器清理记录后配置会被清空，导入这份文件即可一次性恢复，不用重新录入。</div>
       <div class="group-tip" style="margin-bottom:12px;">导出文件名固定为「顺丰部门配置备份.json」。保存到同一个文件夹时，浏览器会提示是否替换，跟着提示覆盖即可，始终只留最新一份备份。</div>
@@ -2684,11 +2517,12 @@ function mtCloudPush(key){
         <div id="backupStat" style="font-size:13px;line-height:2;"></div>
       </div>
       <div class="btn-group">
-        <button class="primary" onclick="EXPRESS.exportConfig()">一键导出备份</button>
-        <button class="info" onclick="document.getElementById('fileConfig').click()">一键导入备份</button>
+        <button class="primary" onclick="EXPRESS.exportConfig()">导出备份</button>
+        <button class="info" onclick="document.getElementById('fileConfig').click()">导入备份</button>
         <input type="file" id="fileConfig" accept=".json" style="display:none;" onchange="EXPRESS.importConfig(this)">
       </div>
       <div class="group-tip" style="margin-top:10px;">导入时会让你选「合并」或「覆盖」：合并保留现有配置、同编码同工号用备份里的更新；覆盖则先清空当前配置再整体恢复备份。</div>
+    </div>
     </div>
 
     <hr>
@@ -2704,8 +2538,8 @@ function mtCloudPush(key){
 <section class="view" id="view-docs" hidden>
 <div class="tool-switch">
   <div class="ts-left">
-    <button type="button" class="tool-tab active" data-doc-tab="archive" onclick="switchDoc('archive')">巡查台账说明</button>
-    <button type="button" class="tool-tab" data-doc-tab="express" onclick="switchDoc('express')">快递月结说明</button>
+    <button  class="tool-tab active" data-doc-tab="archive" onclick="switchDoc('archive')">巡查台账说明</button>
+    <button  class="tool-tab" data-doc-tab="express" onclick="switchDoc('express')">快递月结说明</button>
   </div>
   <span class="ts-note">使用文档·操作指南</span>
 </div>
@@ -2728,12 +2562,12 @@ function mtCloudPush(key){
         <aside class="doc-side">
           <div class="doc-side-h">目录 / CONTENTS</div>
           <div class="toc-line">
-                <button type="button" class="toc-btn" onclick="scrollToSec('d1')">01 录入与识别</button>
-                <button type="button" class="toc-btn" onclick="scrollToSec('d2')">02 校对与同步时间</button>
-                <button type="button" class="toc-btn" onclick="scrollToSec('d3')">03 配置板块</button>
-                <button type="button" class="toc-btn" onclick="scrollToSec('d4')">04 数据与备份</button>
-                <button type="button" class="toc-btn" onclick="scrollToSec('d5')">05 常见问题</button>
-                <button type="button" class="toc-btn" onclick="scrollToSec('d6')">06 登录与同步</button>
+                <button  class="toc-btn" onclick="scrollToSec('d1')">01 录入与识别</button>
+                <button  class="toc-btn" onclick="scrollToSec('d2')">02 校对与同步时间</button>
+                <button  class="toc-btn" onclick="scrollToSec('d3')">03 配置板块</button>
+                <button  class="toc-btn" onclick="scrollToSec('d4')">04 数据与备份</button>
+                <button  class="toc-btn" onclick="scrollToSec('d5')">05 常见问题</button>
+                <button  class="toc-btn" onclick="scrollToSec('d6')">06 登录与同步</button>
               </div>
         </aside>
         <div class="doc-main">
@@ -2823,12 +2657,12 @@ function mtCloudPush(key){
         <aside class="doc-side">
           <div class="doc-side-h">目录 / CONTENTS</div>
           <div class="toc-line">
-                  <button type="button" class="toc-btn" onclick="scrollToSec('x1')">01 上传两份表</button>
-                  <button type="button" class="toc-btn" onclick="scrollToSec('x2')">02 识别与主界面</button>
-                  <button type="button" class="toc-btn" onclick="scrollToSec('x3')">03 五个结果标签</button>
-                  <button type="button" class="toc-btn" onclick="scrollToSec('x4')">04 设置五个页签</button>
-                  <button type="button" class="toc-btn" onclick="scrollToSec('x5')">05 导出与常见问题</button>
-                  <button type="button" class="toc-btn" onclick="scrollToSec('x6')">06 登录与同步</button>
+                  <button  class="toc-btn" onclick="scrollToSec('x1')">01 上传两份表</button>
+                  <button  class="toc-btn" onclick="scrollToSec('x2')">02 识别与主界面</button>
+                  <button  class="toc-btn" onclick="scrollToSec('x3')">03 五个结果标签</button>
+                  <button  class="toc-btn" onclick="scrollToSec('x4')">04 配置五个页签</button>
+                  <button  class="toc-btn" onclick="scrollToSec('x5')">05 导出与常见问题</button>
+                  <button  class="toc-btn" onclick="scrollToSec('x6')">06 登录与同步</button>
                 </div>
         </aside>
         <div class="doc-main">
@@ -2840,11 +2674,11 @@ function mtCloudPush(key){
         <h3><i>01</i>上传两份表</h3>
         <p>工具要两份文件：一份顺丰月结原始账单，一份当月人员花名册。都支持 xlsx / xls / csv，点虚线框选择，或直接把文件拖进去。</p>
         <ul>
-          <li>账单上传：放「① 上传顺丰月结账单」，账单至少要有运费金额、付款方式、寄件人姓名三列；账单没有工号，不用找工号列。有「运单号」列的话，到设置里把它指定出来，匹配会更准；</li>
-          <li>花名册上传：放「② 上传人员花名册」，需要员工工号、员工姓名、行政组织名称三列；花名册自带运单号时，也到设置里把「运单号」指定出来；</li>
+          <li>账单上传：放「① 上传顺丰月结账单」，账单至少要有运费金额、付款方式、寄件人姓名三列；账单没有工号，不用找工号列。有「运单号」列的话，到配置里把它指定出来，匹配会更准；</li>
+          <li>花名册上传：放「② 上传人员花名册」，需要员工工号、员工姓名、行政组织名称三列；花名册自带运单号时，也到配置里把「运单号」指定出来；</li>
           <li>表头默认：账单默认把第 2 行当表头（顺丰原表第 1 行是合并大标题），花名册默认第 1 行，上传后直接解析，不弹窗问你选表；</li>
-          <li>上传后区域下方会显示读到的行数与表头行，想确认读对没有，先看这一行；读不出表头（换个表头行、表里有多张工作表）会弹提醒，点「去字段识别」跳到设置，改工作表或表头行号，再点「按当前设置重新解析」；</li>
-          <li>花名册只认「行政组织名称」这一列：拿完整路径去「设置 → 部门映射」里对同一字段，对上就直接取该行的核算组织编码与核算组织名称，花名册不用写编码；路径首尾多写的「/」、连续「//」会自动忽略。顺丰导出的路径和公司对照表层级不一致时，会逐级砍掉最前面一级再比对，最多砍到只剩两级，仍然对不上才进未匹配、原因显示「未找到部门」。</li>
+          <li>上传后区域下方会显示读到的行数与表头行，想确认读对没有，先看这一行；读不出表头（换个表头行、表里有多张工作表）会弹提醒，点「去字段识别」跳到配置，改工作表或表头行号，再点「按当前设置重新解析」；</li>
+          <li>花名册只认「行政组织名称」这一列：拿完整路径去「配置 → 部门映射」里对同一字段，对上就直接取该行的核算组织编码与核算组织名称，花名册不用写编码；路径首尾多写的「/」、连续「//」会自动忽略。顺丰导出的路径和公司对照表层级不一致时，会逐级砍掉最前面一级再比对，最多砍到只剩两级，仍然对不上才进未匹配、原因显示「未找到部门」。</li>
         </ul>
       </div>
 
@@ -2854,7 +2688,7 @@ function mtCloudPush(key){
         <ul>
           <li>开始识别匹配：按当前配置重新跑一遍全部单据，改了规则、加了映射之后都要点它才生效；</li>
           <li>导出汇总 Excel：把当前结果导成 xlsx，随时可点，不影响数据；</li>
-          <li>设置：打开五个页签（部门映射、人员映射、字段识别、人员类型、配置备份）的配置弹窗；</li>
+          <li>配置：打开五个页签（部门映射、人员映射、人员类型、字段识别、配置备份）的配置弹窗；</li>
         </ul>
         <p>跑完先看三块信息，判断这一批对不对：</p>
         <ul>
@@ -2865,13 +2699,13 @@ function mtCloudPush(key){
         <p>匹配按固定顺序走，前一步命中就不往下：<b>人员映射 → 运单号 → 姓名 → 人员类型 → 部门映射</b>。人员映射优先级最高：工号或姓名在人员映射里有一条记录，就以映射里的部门为准，花名册读出的部门不再覆盖它（想临时改一票，去明细清单「修改部门」即可，那条只改当行）。只有人员映射里没有这个人，才用花名册的部门去查部门映射。</p>
         <ul>
           <li>运单号优先：账单和花名册都指定了「运单号」列时，先按运单号在花名册定位到唯一那个人，同名同姓也能分开认，来源列标「运单号匹配」；运单号对不上或一个单号对应多人才继续往下；</li>
-          <li>人员映射优先于人员类型、也优先于花名册部门：长期合作的外包人员提前录一条映射（工号或姓名 → 核算组织），之后同类单据直接自动归类，既不用每次人工确认，也不会被花名册里的旧部门覆盖；人员映射只在「设置 → 人员映射」里维护（新增 / 编辑 / 批量导入），匹配结果里不再自动写；</li>
+          <li>人员映射优先于人员类型、也优先于花名册部门：长期合作的外包人员提前录一条映射（工号或姓名 → 核算组织），之后同类单据直接自动归类，既不用每次人工确认，也不会被花名册里的旧部门覆盖；人员映射只在「配置 → 人员映射」里维护（新增 / 编辑 / 导入），匹配结果里不再自动写；</li>
           <li>按姓名匹配时忽略空格与全角，「张 三」和「张三」认作同一人。几千人的部门里有同名很正常，所以只要花名册里有部门就归入，不因同名、工号不同、部门不同拦人工：几个候选部门一致时标「同名·同部门」；只有一个候选有部门时标「同名·唯一部门」；分属不同核算组织时取花名册第一条的部门、标「同名·自动」，工号列同时列出全部候选供你核对。只有候选在花名册里全都没有部门，才进未匹配、原因「未找到部门」。唯一强制人工确认的情况：同一个工号在花名册里出现多条、且解析出多个不同核算组织（同工号挂两个核算组织属数据异常），这类进未匹配、原因「同工号·多个核算组织」，部门框已预选第一条；多条部门其实归同一核算组织时照常通过；</li>
           <li>人员类型按工号判定：规则表里勾了「外包 / 供应商」的类型（如 W 开头、7 开头）一律不自动归属，全部进未匹配清单，原因直接显示你起的类型名称；不在规则表里的工号段也不归属，原因显示「未知工号段」，去「人员类型」补一条就恢复自动匹配；</li>
           <li>部门映射按「/」层级逐级截头比对：先按完整路径找一模一样的，找不到就砍掉最前面一级继续找，一直试到只剩两级；命中多条同后缀时会拒绝自动归属，留给人工确认。控制台会打印每条单据试过的路径与命中的层级，方便核对；</li>
           <li>同一张运单号对应到花名册里多个人时，同样先看部门：部门一致就直接归集（来源列标「运单号·同部门」），不一致才进未匹配等人工确认；</li>
         </ul>
-        <div class="doc-tip">表头名称和预设不一致会弹表头校验提示，去「设置 → 字段识别」手动指定列，再点「开始识别匹配」。</div>
+        <div class="doc-tip">表头名称和预设不一致会弹表头校验提示，去「配置 → 字段识别」手动指定列，再点「开始识别匹配」。</div>
       </div>
 
       <div class="doc-entry" id="x3">
@@ -2879,21 +2713,21 @@ function mtCloudPush(key){
         <ul>
           <li>部门汇总：只读的核算结果，一个部门一行，列是部门、部门编码、应付金额、不含税金额（应付 / 1.06）、税率、数量；要改数去明细或未匹配里调，这里不用手改；</li>
           <li>明细清单：匹配成功的单据（不显示人员类型，需要看类型去未匹配清单或搜索结果），最后的部门列叫「修改部门」，点开是带搜索的下拉面板，直接输部门名称或编码就能筛；三处清单的下拉都只显示「核算组织名称（编码）」，不再带小组后缀，选中后这一行立刻重算，只改这一行、不写人员映射；某行不该算进来，点「移出」；</li>
-          <li>未匹配清单：放没认出来的单据，列里有工号（花名册）、姓名、人员类型、未匹配原因、金额。能按花名册路径查到核算部门的，部门框已经预选好，核实后点「保存」这条直接进明细清单（不再问「是否写入人员映射」，人员映射统一去设置里手动维护）；嫌逐条点麻烦就点右上角「按预选批量归入（N 条）」一次全归。只有「花名册部门在部门映射里查不到」这一种情况，保存时才弹「是否绑定部门」：确认绑定＝把这条花名册路径写进部门映射、下次同路径自动匹配；仅本次生效＝不写映射、这条照样进明细。保存任何一条后，同一花名册路径的其他未匹配行会自动预选同一个核算组织，接一次批量归入就行。公共账号（前台 O / F 之类）特殊：不按规则自动预选、也不弹绑定，每单自己选；但你给其中一条选好部门保存后，同路径的其他公共账号行会自动预选成同一个核算组织，同样不写部门映射。「未匹配原因」和「人员类型」内容相同时（比如都是外包员工、公共账号）只显示「/」，不重复写；整条不该算的就点「忽略」；</li>
+          <li>未匹配清单：放没认出来的单据，列里有工号、姓名、人员类型、未匹配原因、金额。能按花名册路径查到核算部门的，部门框已经预选好，核实后点「保存」这条直接进明细清单（不再问「是否写入人员映射」，人员映射统一去配置里手动维护）；嫌逐条点麻烦就点右上角「按预选批量归入（N 条）」一次全归。只有「花名册部门在部门映射里查不到」这一种情况，保存时才弹「是否绑定部门」：确认绑定＝把这条花名册路径写进部门映射、下次同路径自动匹配；仅本次生效＝不写映射、这条照样进明细。保存任何一条后，同一花名册路径的其他未匹配行会自动预选同一个核算组织，接一次批量归入就行。公共账号（前台 O / F 之类）特殊：不按规则自动预选、也不弹绑定，每单自己选；但你给其中一条选好部门保存后，同路径的其他公共账号行会自动预选成同一个核算组织，同样不写部门映射。「未匹配原因」和「人员类型」内容相同时（比如都是外包员工、公共账号）只显示「/」，不重复写；整条不该算的就点「忽略」；</li>
           <li>到付清单：付款方式含「到付」的单据不自动匹配，全部集中在这里。选好部门点「加入账单」才计入汇总；同名多行（同一个人有好几票到付）只要给第一行选定部门，后面同名且还没选的行会自动预选同一个核算组织，逐个点「加入账单」即可；不需要的点「删除」，删错了在同一行点「恢复」可以撤回；</li>
           <li>搜索结果：顶部搜索框作用于当前标签，配合部门下拉一起用，能快速定位某个人、某个部门或某张运单的单据。</li>
         </ul>
       </div>
 
       <div class="doc-entry" id="x4">
-        <h3><i>04</i>设置五个页签怎么用</h3>
+        <h3><i>04</i>配置五个页签怎么用</h3>
         <ul>
           <li>部门映射：一条记录三个字段——核算组织编码、行政组织名称、核算组织名称，照公司给的核算对照表填。新增就填三个框点「保存」，改内容点该行「编辑」，不要的点「删除」；行政组织名称不能重复，核算组织编码可以多条共用（多个分部门归同一个核算组织），核算组织名称留空会自动用行政组织名称顶上。行政组织名称是匹配键，必须是花名册里的完整路径。表格上方搜索框按编码或名称筛，右侧显示共几条、筛出几条；</li>
-          <li>部门映射批量导入：公司给了核算对照表就点「批量导入映射表」，读三列的 Excel / CSV，单元格里的全角空格、不换行空格、零宽字符、多余换行会自动清洗，合并单元格会按左上角展开，表头最多往下找 20 行，工作表也会自动挑带这些列名的那张；同一「行政组织名称」更新内容，新路径追加，空行跳过；导入完弹窗给出读取 / 新增 / 更新 / 跳过条数与跳过行号，可导出失败明细 CSV 核对；没有现成表点「下载模板」按三列示例填；旧的两列「编码 + 名称」文件也能导，名称会同时当行政组织名称与核算组织名称；</li>
-          <li>人员映射：工号或姓名 → 部门，保存后立刻对结果生效，优先级高于人员类型。新增、编辑时部门选择旁有搜索框，输部门名称或核算组织编码就能筛，只剩一个结果会自动选上；表格上方搜索框按工号 / 姓名 / 部门筛；批量做点「批量导入映射」（工号、姓名、部门编码三列，可点「下载模板」），要重来点「清空数据」；</li>
+          <li>部门映射批量导入：公司给了核算对照表就点「导入映射」，读三列的 Excel / CSV，单元格里的全角空格、不换行空格、零宽字符、多余换行会自动清洗，合并单元格会按左上角展开，表头最多往下找 20 行，工作表也会自动挑带这些列名的那张；同一「行政组织名称」更新内容，新路径追加，空行跳过；导入完弹窗给出读取 / 新增 / 更新 / 跳过条数与跳过行号，可导出失败明细 CSV 核对；没有现成表点「下载模板」按三列示例填；旧的两列「编码 + 名称」文件也能导，名称会同时当行政组织名称与核算组织名称；</li>
+          <li>人员映射：工号或姓名 → 部门，保存后立刻对结果生效，优先级高于人员类型。新增时点开「搜索并选择部门」下拉，直接输入部门名称或核算组织编码筛选，选中即回填；编辑时部门选择旁也有搜索框，只剩一个结果会自动选上；表格上方搜索框按工号 / 姓名 / 部门筛；批量做点「批量导入映射」（工号、姓名、部门编码三列，可点「下载模板」），要重来点「清空数据」；</li>
           <li>字段识别：账单和花名册各选一次工作表和表头行，再把六个字段的下拉对上——运费金额、付款方式、寄件人姓名、运单号（账单侧），员工工号、员工姓名、行政组织名称、运单号（花名册侧）。导入后会自动按常见列名预选：账单认「应付金额 / 付款方式 / 寄件人 / 运单号码」，花名册认「工号 / 寄件人姓名 / 部门 / 运单编号」（表头写「费用归属部门名称」「行政组织名称」也能认）；表头换了名字就在这里手动指，改完点「按当前设置重新解析」；</li>
           <li>人员类型：规则表默认是空的，第一次用要按贵司工号规则自己加（例如「前缀 W → W外包，需人工确认」和「工号长度 8 → 内部员工」）。一张从上到下依次判断的规则表，第一条命中即生效，所以前缀规则要排在长度规则前面。新增：选匹配方式（前缀匹配 / 工号匹配（完全相同）/ 工号长度）→ 填值 → 填类型名称（这个名字会直接显示成未匹配原因）→ 选是否外包 / 供应商，点「添加规则」。规则按添加先后从上到下排列，新加的排在末尾，要改某条点「编辑」（表单会回填，改完点「保存修改」），不要的点「删除」。规则为空或某个工号哪条都没命中时，该单据一律进未匹配并标「未知工号段」；勾了外包 / 供应商的类型一律需人工确认部门；</li>
-          <li>配置备份：点「一键导出备份」存成一个 json，部门映射、人员映射、人员类型规则和表结构（账单 / 花名册的工作表与表头行）整套打包；换电脑、或浏览器清理记录后，点「一键导入备份」选这个文件，再选「合并导入」（保留现有配置，同编码同类目用备份里的更新）或「覆盖导入」（清空后整体恢复）即可。备份建议放桌面或网盘，清理浏览器记录前先导出一份。注意列级字段识别不在这份备份里，换表头名字仍要在「字段识别」里重设。</li>
+          <li>配置备份：点「导出备份」存成一个 json，部门映射、人员映射、人员类型规则和表结构（账单 / 花名册的工作表与表头行）整套打包；换电脑、或浏览器清理记录后，点「一键导入备份」选这个文件，再选「合并导入」（保留现有配置，同编码同类目用备份里的更新）或「覆盖导入」（清空后整体恢复）即可。备份建议放桌面或网盘，清理浏览器记录前先导出一份。注意列级字段识别不在这份备份里，换表头名字仍要在「字段识别」里重设。</li>
         </ul>
       </div>
 
@@ -2952,6 +2786,13 @@ function mtCloudPush(key){
       <div class="log-date"><b>11/23</b>2026</div>
       <div class="log-rail" aria-hidden="true"></div>
       <div class="log-body">
+        <h3>快递月结·设置弹窗体验优化<span class="log-tag">交互优化</span></h3>
+        <ul>
+          <li>Tab标签切换增加平滑动态高度过渡动画，解决切换面板弹窗忽高忽低跳动问题。</li>
+          <li>修复重复点击同一Tab重复执行动画抖动问题；增加无障碍动画降级适配。</li>
+          <li>人员映射布局对齐部门映射：调整按钮排布，【添加映射】放置首位，精简按钮文案，移除无用的清空输入按钮。</li>
+          <li>移除独立部门搜索输入框，复用现有可搜索下拉组件完成部门筛选选择，界面更简洁。</li>
+        </ul>
         <h3>顶部导航增强<span class="log-tag">视觉优化</span></h3>
         <ul>
           <li>导航阴影：页面滚动超过 8px 时顶部导航浮现柔和阴影，回到顶部自动消失，过渡 0.25s；浅色白底，不引入暗黑模式。</li>
@@ -3033,10 +2874,10 @@ function mtCloudPush(key){
           <li>花名册路径与公司对照表层级不一致时，按「/」逐级砍掉最前面一级继续精确比对，最多砍到只剩两级，仍对不上才判「未找到部门」；未匹配原因不再错显人员类型，人员类型单独一列。</li>
           <li>只要花名册里有部门就归入，同名、工号不同、部门不同都不拦：部门一致标「同名·同部门」，只有一个候选有部门标「同名·唯一部门」，部门不同时取花名册第一条的部门并标「同名·自动」（工号列列出全部候选）。同一运单号对应多人同理，标「运单号·同部门 / 唯一部门 / 自动」；候选全都没部门的才进未匹配「未找到部门」。唯一强制人工确认：同工号在花名册出现多条且解析出多个不同核算组织（数据异常），进未匹配、原因「同工号·多个核算组织」并已预选第一条；多条部门归同一核算组织时照常通过。</li>
           <li>核算组织编码可以多条共用（多个分部门归同一核算组织），只要求行政组织名称不重复；未匹配 / 到付的部门下拉同一核算组织只列一条，明细清单仍按小组区分。</li>
-          <li>必须人工确认的单据（外包 / 供应商、未知工号段）导入即按花名册路径预选核算部门，核实后点「保存」直接进明细清单，也可用「按预选批量归入」一次全归；保存不再询问是否写入人员映射（人员映射去设置里手动维护），只有花名册部门在映射里查不到时弹「是否绑定部门」，确认绑定才写入部门映射；保存后同一花名册路径的其他单据会自动预选好同一核算组织，公共账号不弹绑定、但同样自动预选。人员类型是「公共账号」的（前台 O / F）不自动预选、不弹绑定；人工给同路径的一条选好部门后，其余同路径的自动预选同一个核算组织。</li>
+          <li>必须人工确认的单据（外包 / 供应商、未知工号段）导入即按花名册路径预选核算部门，核实后点「保存」直接进明细清单，也可用「按预选批量归入」一次全归；保存不再询问是否写入人员映射（人员映射去配置里手动维护），只有花名册部门在映射里查不到时弹「是否绑定部门」，确认绑定才写入部门映射；保存后同一花名册路径的其他单据会自动预选好同一核算组织，公共账号不弹绑定、但同样自动预选。人员类型是「公共账号」的（前台 O / F）不自动预选、不弹绑定；人工给同路径的一条选好部门后，其余同路径的自动预选同一个核算组织。</li>
           <li>三处清单的部门下拉（连同展开后的候选列表）统一只显示「核算组织名称（编码）」，不再带小组后缀，同一核算组织只留一条；明细清单的部门列名由「改部门」改为「修改部门」。</li>
           <li>到付清单同名多行联动：给第一行选定部门后，后面同名、还没选部门的行自动预选同一个核算组织，逐条点「加入账单」即可，不用重复选。</li>
-          <li>人员映射优先级提到最高：工号或姓名命中人员映射的，直接按映射里的核算组织归类，花名册部门不再覆盖（运单号命中多人这种场景同样先看人员映射）；只在「设置 → 人员映射」手动维护，匹配结果里不再自动写入。人员映射新增、编辑时部门选择旁有搜索框，只剩一个结果自动选上；设置弹窗改为只认「关闭」按钮退出，清搜索框或点到空白处不会再误关，窄屏下自适应宽度。</li>
+          <li>人员映射优先级提到最高：工号或姓名命中人员映射的，直接按映射里的核算组织归类，花名册部门不再覆盖（运单号命中多人这种场景同样先看人员映射）；只在「配置 → 人员映射」手动维护，匹配结果里不再自动写入。人员映射新增、编辑时部门选择旁有搜索框，只剩一个结果自动选上；设置弹窗改为只认「关闭」按钮退出，清搜索框或点到空白处不会再误关，窄屏下自适应宽度。</li>
         </ul>
       </div>
     </div>
@@ -3408,32 +3249,14 @@ function init() {
     const lastExport = localStorage.getItem(LAST_EXPORT_TIME_KEY);
     document.getElementById("lastExportTip").innerText = lastExport ? ("上次导出：" + lastExport) : "上次导出：暂无";
     renderTable();
-    refreshStats();
 }
 function saveRecLocal() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(recordList));
     mtCloudPush(STORAGE_KEY);
-    refreshStats();
 }
 function saveCfgLocal() {
     localStorage.setItem(CFG_STORAGE_KEY, JSON.stringify(cfg));
     mtCloudPush(CFG_STORAGE_KEY);
-    refreshStats();
-}
-
-function refreshStats(){
-    const recN = document.getElementById("stRecords");
-    const plN = document.getElementById("stPlates");
-    const itN = document.getElementById("stItems");
-    const exN = document.getElementById("stExport");
-    if (!recN) return;
-    let items = 0;
-    cfg.plates.forEach(p => { items += (p.items ? p.items.length : 0); });
-    recN.innerText = recordList.length;
-    plN.innerText = cfg.plates.length;
-    itN.innerText = items;
-    const last = localStorage.getItem(LAST_EXPORT_TIME_KEY);
-    exN.innerText = last ? last.replace(/\s+/g, " ") : "暂无导出";
 }
 
 function openCfgModal() {
@@ -3696,14 +3519,27 @@ function recordTimeNum(r) {
     return isNaN(d.getTime()) ? 0 : d.getTime();
 }
 
-/* 页面展示用：最新日期在最上面；同一天里后登记的排前面 */
+/* 页面展示用：日期最新的排在最上面；同一天里后登记的排在同日最前。
+   日期为主键倒序，登记索引为同日次级键倒序（登记顺序不变） */
 function recordListForView() {
-    return recordList.slice().reverse();
+    return recordList.map(function (r, i) { return { r: r, i: i }; })
+        .sort(function (a, b) {
+            var dt = recordTimeNum(b.r) - recordTimeNum(a.r);
+            if (dt !== 0) return dt;
+            return b.i - a.i;
+        })
+        .map(function (x) { return x.r; });
 }
 
-/* 导出用：由早到晚，同一天按登记先后（先登记的在前） */
+/* 导出用：由早到晚，同一天按登记先后（先登记的在前）；时间解析不出时保持原序 */
 function recordListForExport() {
-    return recordList.slice().sort(function (a, b) { return recordTimeNum(a) - recordTimeNum(b); });
+    return recordList.map(function (r, i) { return { r: r, i: i }; })
+        .sort(function (a, b) {
+            var dt = recordTimeNum(a.r) - recordTimeNum(b.r);
+            if (dt !== 0) return dt;
+            return a.i - b.i;
+        })
+        .map(function (x) { return x.r; });
 }
 
 function renderTable() {
@@ -3872,7 +3708,6 @@ function exportXlsx() {
         const nowStr = new Date().toLocaleString();
         localStorage.setItem(LAST_EXPORT_TIME_KEY, nowStr);
         document.getElementById("lastExportTip").innerText = "上次导出：" + nowStr;
-        refreshStats();
     } catch (err) {
         alert("导出失败：" + err.message);
         console.error(err);
@@ -4402,13 +4237,14 @@ function onDeptSearch(v) { deptKw = String(v || "").trim(); renderDept(); }
 function onMapSearch(v) { mapKw = String(v || "").trim(); renderManual(); }
 
 /* ===== v1.81：设置内三张表固定只露 6 行，其余在容器内滚动 ===== */
-function clampRows6(sel) {
+function clampRows6(sel, maxRows) {
+  var n = maxRows || 6;
   var wrap = q(sel);
   if (!wrap) return;
   var tb = wrap.querySelector("tbody");
   if (!tb) return;
   var rows = tb.rows || [];
-  if (rows.length <= 6) {
+  if (rows.length <= n) {
     wrap.style.maxHeight = "";
     wrap.classList.remove("has-more");
     return;
@@ -4416,28 +4252,42 @@ function clampRows6(sel) {
   var headRow = wrap.querySelector("thead tr");
   var headH = headRow ? headRow.getBoundingClientRect().height : 0;
   if (!headH) return; /* 页签未显示时量不到高度，等切过来再算 */
-  var h = 0;
-  for (var i = 0; i < 6 && i < rows.length; i++) {
-    h += rows[i].getBoundingClientRect().height;
-  }
-  wrap.style.maxHeight = Math.ceil(headH + h + 2) + "px";
+  /* 直接量「表头 + 前 n 行」的底部位置，比按行高累加更准，最后一行不会被切一半 */
+  var wrapTop = wrap.getBoundingClientRect().top;
+  var keep = rows[Math.min(n, rows.length) - 1];
+  var limit = keep.getBoundingClientRect().bottom - wrapTop;
+  if (!(limit > 0)) return;
+  wrap.style.maxHeight = Math.ceil(limit + 1) + "px";
   wrap.classList.add("has-more");
 }
 function clampAllRows6() {
   clampRows6("#deptScroll");
   clampRows6("#manualScroll");
+  /* 人员类型表预留 7 行，所以按 7 行夹 */
+  clampRows6("#rulesScroll", SET_RULES_MIN_ROWS);
 }
 var clampRows6Timer = null;
 window.addEventListener("resize", function () {
   if (clampRows6Timer) clearTimeout(clampRows6Timer);
-  clampRows6Timer = setTimeout(clampAllRows6, 120);
+  clampRows6Timer = setTimeout(function () {
+    clampAllRows6();
+    var ms = q("#modalSettings");
+    if (maskOn(ms)) reflowSetBody();
+  }, 120);
 });
 
 function renderDept() {
   var list = loadDept();
   var tb = q("#deptTbody");
   tb.innerHTML = "";
-  if (!list.length) { tb.innerHTML = '<tr><td colspan="4" class="muted">暂无部门，请先新增</td></tr>'; clampRows6("#deptScroll"); return; }
+  if (!list.length) {
+    tb.innerHTML = '<tr><td colspan="4" class="muted">暂无部门，请先添加映射或导入映射</td></tr>';
+    var et = q("#deptSearchTip");
+    if (et) et.textContent = "共 0 条";
+    fillTableRows("#deptTbody", SET_TABLE_MIN_ROWS);
+    clampRows6("#deptScroll");
+    return;
+  }
   var showed = 0;
   list.forEach(function (d, i) {
     if (deptKw) {
@@ -4455,6 +4305,7 @@ function renderDept() {
   if (!showed) tb.innerHTML = '<tr><td colspan="4" class="muted">没有匹配的部门，换个关键词试试</td></tr>';
   var tip = q("#deptSearchTip");
   if (tip) tip.textContent = deptKw ? ("共 " + list.length + " 条，筛出 " + showed + " 条") : ("共 " + list.length + " 条");
+  fillTableRows("#deptTbody", SET_TABLE_MIN_ROWS);
   clampRows6("#deptScroll");
 }
 function editDept(i) {
@@ -4478,7 +4329,7 @@ function resetDeptInput() {
   q("#inpDeptCode").value = "";
   q("#inpDeptAdmin").value = "";
   q("#inpDeptAcct").value = "";
-  q("#btnDeptSave").textContent = "新增";
+  q("#btnDeptSave").textContent = "添加映射";
   q("#btnDeptSave").className = "primary btn-mini";
 }
 function saveDeptItem() {
@@ -4500,7 +4351,7 @@ function saveDeptItem() {
   var item = { code: code, admin: admin, acct: acct };
   if (editingIdx > -1) list[editingIdx] = item;
   else list.push(item);
-  saveDept(list); resetDeptInput(); renderDept(); renderAll(); refreshMapDeptSel();
+  saveDept(list); resetDeptInput(); renderDept(); renderAll();
   toast("部门映射已保存");
 }
 function delDept(i) {
@@ -4512,38 +4363,174 @@ function delDept(i) {
 function toast(msg) {
   var d = document.createElement("div");
   d.textContent = msg;
-  d.style.cssText = "position:fixed;left:50%;top:24px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);";
+  d.style.cssText = "position:fixed;left:50%;top:24px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:var(--z-toast-top);box-shadow:0 4px 16px rgba(0,0,0,.2);";
   document.body.appendChild(d);
   setTimeout(function () { d.style.transition = "opacity .4s"; d.style.opacity = "0"; }, 1600);
   setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 2100);
 }
 
 /* ---------- 设置弹窗 ---------- */
+/* 快递月结弹窗统一走全局 .modal-mask 的 opacity 显隐：加 / 去 is-show 即可
+   打开时去掉 inert（可交互），关闭时立刻加 inert（即使淡出还没播完也不可点、不可聚焦） */
+function showMask(el) { if (!el) return; el.removeAttribute("inert"); el.classList.add("is-show"); }
+function hideMask(el) { if (!el) return; el.classList.remove("is-show"); el.setAttribute("inert", ""); }
+function maskOn(el) { return !!el && el.classList.contains("is-show"); }
+
 function openSettings() {
-  migrateRuleDefaults();
-  renderDept(); renderManual(); refreshMapDeptSel(); syncFieldTip(); renderLayoutCfg();
-  q("#modalSettings").style.display = "flex";
-  setTab(curSetTab || "dept");
+  /* 先打开遮罩，再渲染内容：渲染anything出错也不会出现「点了配置没反应」，
+     错误会直接摆在面板里，而不是静默失败 */
+  var ms = q("#modalSettings");
+  showMask(ms);
+  var body = q("#setBody");
+  try {
+    migrateRuleDefaults();
+    renderDept(); renderManual(); syncFieldTip(); renderLayoutCfg();
+    /* 三张表都先渲染一次再量高度：否则切到「人员类型」时表格才第一次渲染，
+       量出来的容器高度会比打开时大一截，弹窗会跳 */
+    renderRules();
+    if (body) body.style.height = "0px";
+    setPaneReady = false;
+    fillAllPlaceholders();
+    clampAllRows6();
+    setTab(curSetTab || "dept");
+  } catch (err) {
+    console.error("[配置面板渲染失败]", err);
+    if (body) {
+      body.style.height = "auto";
+      body.innerHTML = '<div style="padding:18px;font-size:13px;line-height:1.9;">'
+        + '<b>配置面板渲染出错</b><br>'
+        + esc(String(err && err.message ? err.message : err))
+        + '<br><span class="muted">数据还在，刷新页面后可重试；把这段文字发给我就能定位。</span></div>';
+    }
+  }
 }
-function closeSettings() { q("#modalSettings").style.display = "none"; resetDeptInput(); }
+function closeSettings() {
+  hideMask(q("#modalSettings"));
+  resetDeptInput();
+  resetMapDeptPick();
+  if (typeof closeDeptPick === "function") closeDeptPick();
+  setPaneReady = false;
+}
 var curSetTab = "dept";
+var setPaneReady = false;
+var SET_PANES = { dept: "#setPaneDept", manual: "#setPaneManual", fields: "#setPaneFields", rules: "#setPaneRules", backup: "#setPaneBackup" };
+
+var SET_TABLE_MIN_ROWS = 6;
+/* 人员类型规则表给 7 行预留框，其余两张表仍是 6 行 */
+var SET_RULES_MIN_ROWS = 7;
+/* 表格补占位行：数据不足 6 行时补空白行，行高与数据行一致，把预留框撑满 */
+function fillTableRows(tbodySel, minRows) {
+  var tb = q(tbodySel);
+  if (!tb) return;
+  /* 先记住真实行的行高：占位行要跟它一样高，表格框才是齐的 */
+  var rowH = 0, real = 0, sumH = 0, tipRow = 0;
+  Array.prototype.forEach.call(tb.rows, function (tr) {
+    if (tr.classList.contains("ph-row")) return;
+    /* 空态提示行（colspan 跨列）占 1 行，但不参与行高参考 */
+    if (tr.cells.length === 1 && tr.cells[0].hasAttribute("colspan")) { tipRow = 1; return; }
+    real++;
+    sumH += tr.getBoundingClientRect().height;
+  });
+  if (real) rowH = Math.round(sumH / real);
+  /* 清掉旧占位行 */
+  Array.prototype.forEach.call(tb.querySelectorAll("tr.ph-row"), function (tr) {
+    if (tr.parentNode) tr.parentNode.removeChild(tr);
+  });
+  var table = tb.closest ? tb.closest("table") : null;
+  var cols = (table && table.tHead && table.tHead.rows[0]) ? table.tHead.rows[0].cells.length : 1;
+  var need = minRows - real - tipRow;
+  for (var i = 0; i < need; i++) {
+    var tr = document.createElement("tr");
+    tr.className = "ph-row";
+    if (rowH > 0) tr.style.height = rowH + "px";
+    var html = "";
+    for (var c = 0; c < cols; c++) html += "<td>&nbsp;</td>";
+    tr.innerHTML = html;
+    tb.appendChild(tr);
+  }
+}
+function fillAllPlaceholders() {
+  fillTableRows("#deptTbody", SET_TABLE_MIN_ROWS);
+  fillTableRows("#manualTbody", SET_TABLE_MIN_ROWS);
+  fillTableRows("#rulesTbody", SET_RULES_MIN_ROWS);
+}
+
+/* 量出五个页签里最高的一个，作为容器固定高度（再受视口可用高度约束） */
+function measureSetPanes() {
+  var maxH = 0;
+  Object.keys(SET_PANES).forEach(function (k) {
+    var p = q(SET_PANES[k]);
+    if (!p) return;
+    maxH = Math.max(maxH, p.scrollHeight);
+  });
+  var body = q("#setBody");
+  var modal = body && body.closest ? body.closest(".set-modal") : null;
+  var limit = Math.round(window.innerHeight * 0.88) - 10;
+  if (modal && modal.getBoundingClientRect().height > 0) {
+    var cs = getComputedStyle(modal);
+    var boxOf = function (el) {
+      var s2 = getComputedStyle(el);
+      return el.getBoundingClientRect().height + (parseFloat(s2.marginTop) || 0) + (parseFloat(s2.marginBottom) || 0);
+    };
+    var chrome = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0)
+      + (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+    Array.prototype.forEach.call(modal.children, function (el) {
+      if (el === body) return;
+      chrome += boxOf(el);
+    });
+    limit = limit - chrome;
+  }
+  return Math.max(200, Math.min(maxH, Math.round(limit)));
+}
+/* 容器高度固定：只在打开弹窗、数据重绘、窗口尺寸变化时更新，切页签时不动它 */
+function layoutSetBody() {
+  var body = q("#setBody");
+  if (!body) return;
+  body.style.height = "0px";
+  body.style.height = measureSetPanes() + "px";
+}
+function reflowSetBody() {
+  var ms = q("#modalSettings");
+  if (!maskOn(ms)) return;
+  layoutSetBody();
+}
+
 function setTab(name) {
+  /* 重复点击当前页签：直接返回，不重播动画 */
+  if (name === curSetTab && setPaneReady) return;
+
   curSetTab = name;
   var tabs = document.querySelectorAll(".set-tab");
   Array.prototype.forEach.call(tabs, function (el) {
     if (el.getAttribute("data-set") === name) el.classList.add("active");
     else el.classList.remove("active");
   });
-  q("#setPaneDept").classList.toggle("hide", name !== "dept");
-  q("#setPaneManual").classList.toggle("hide", name !== "manual");
-  q("#setPaneFields").classList.toggle("hide", name !== "fields");
-  q("#setPaneRules").classList.toggle("hide", name !== "rules");
+
+  /* 数据先渲染、表格先补满占位行，接下来量出来的高度才是稳定的 */
   if (name === "rules") renderRules();
-  if (name === "manual") refreshMapDeptSel();
-  q("#setPaneBackup").classList.toggle("hide", name !== "backup");
   if (name === "backup") renderBackupStat();
   syncFieldTip();
-  requestAnimationFrame(function () { clampAllRows6(); });
+  fillAllPlaceholders();
+  if (typeof clampAllRows6 === "function") clampAllRows6();
+
+  if (typeof closeDeptPick === "function") closeDeptPick();
+
+  /* 非激活页签立刻隐去（visibility 不参与过渡），只让新页签淡入 */
+  Object.keys(SET_PANES).forEach(function (k) {
+    var p = q(SET_PANES[k]);
+    if (p) p.classList.remove("pane-in");
+  });
+  layoutSetBody();
+
+  var pane = q(SET_PANES[name]);
+  if (pane) {
+    pane.scrollTop = 0;
+    /* 隔两帧再加入场类：先让 0 状态落地，0.28s 的过渡才会真正跑起来 */
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { pane.classList.add("pane-in"); });
+    });
+  }
+  setPaneReady = true;
 }
 
 function renderRules() {
@@ -4552,6 +4539,9 @@ function renderRules() {
   tb.innerHTML = "";
   if (!rules.length) {
     tb.innerHTML = '<tr><td colspan="5" class="muted">还没有人员类型规则，此时所有工号都会进未匹配清单，请按贵司工号规则在下面手动添加。</td></tr>';
+    fillTableRows("#rulesTbody", SET_RULES_MIN_ROWS);
+    clampRows6("#rulesScroll", SET_RULES_MIN_ROWS);
+    reflowSetBody();
     return;
   }
   rules.forEach(function (r, i) {
@@ -4565,6 +4555,10 @@ function renderRules() {
       '<button class="btn-mini danger" onclick="EXPRESS.delRule(' + i + ')">删除</button></td>';
     tb.appendChild(tr);
   });
+  fillTableRows("#rulesTbody", SET_RULES_MIN_ROWS);
+  /* 规则超过 7 行时表格内部滚动，弹窗高度不跟着长 */
+  clampRows6("#rulesScroll", SET_RULES_MIN_ROWS);
+  reflowSetBody();
 }
 /* 正在编辑的规则下标，-1 表示新增 */
 var editingRule = -1;
@@ -4714,14 +4708,14 @@ function importConfig(input) {
       "备份文件包含：部门映射 <b>" + dCount + " 条</b>、人员映射 <b>" + mCount + " 条</b>、人员类型规则 <b>" + rCount + " 条</b>、字段识别 <b>" + layoutTxt + "</b>。" +
       "<br><br><b>覆盖导入</b>：先清空当前全部配置，再整体恢复备份。" +
       "<br><b>合并导入</b>：保留现有配置，同编码 / 同工号用备份里的内容更新，其余追加。";
-    q("#modalBkMode").style.display = "flex";
+    showMask(q("#modalBkMode"));
     input.value = "";
   };
   fr.readAsText(f);
 }
 
 function closeBkMode() {
-  q("#modalBkMode").style.display = "none";
+  hideMask(q("#modalBkMode"));
   pendingBk = null;
 }
 
@@ -4854,19 +4848,6 @@ function typeText(t) {
 }
 
 /* ---------- 文件 ---------- */
-function parseSheet(buf) {
-  var wb = XLSX.read(buf, { type: "array" });
-  var sh = wb.Sheets[wb.SheetNames[0]];
-  return XLSX.utils.sheet_to_json(sh, { defval: "" });
-}
-function readFile(file, cb) {
-  var fr = new FileReader();
-  fr.onload = function (e) {
-    try { cb(parseSheet(e.target.result), file.name); }
-    catch (err) { toast("解析失败：" + err.message); }
-  };
-  fr.readAsArrayBuffer(file);
-}
 function fillSelOpt(id, headers, keys, emptyLabel, prefer) {
   var best = fillSel(id, headers, keys, prefer);
   if (best < 0){
@@ -4954,11 +4935,11 @@ function applyRosterRows(rows, name) {
     };
     checkRosterHeader(h);
 }
-function closeWarn() { q("#modalWarn").style.display = "none"; }
+function closeWarn() { hideMask(q("#modalWarn")); }
 function showWarn(title, html) {
   q("#warnTitle").textContent = title;
   q("#warnBody").innerHTML = html;
-  q("#modalWarn").style.display = "flex";
+  showMask(q("#modalWarn"));
 }
 function headerList(h) {
   var arr = h.map(function (x) { return "<span class='hk'>" + esc(String(x)) + "</span>"; });
@@ -4972,7 +4953,7 @@ function buildWarnBody(fileName, headers, missing, optionalMissing) {
   if (optionalMissing && optionalMissing.length) {
     html += "<div class='warn-line muted'>选填列未识别：" + optionalMissing.join("、") + "（不影响统计，姓名会显示为空）</div>";
   }
-  html += "<div class='warn-line'>处理办法：把 Excel 的表头改成上面的列名之一，或到「设置 → 字段识别」里把对应字段改成你实际的列名，然后重新上传。</div>";
+  html += "<div class='warn-line'>处理办法：把 Excel 的表头改成上面的列名之一，或到「配置 → 字段识别」里把对应字段改成你实际的列名，然后重新上传。</div>";
   html += "<div class='warn-line muted'>本次已停止识别，不会产生错误的统计结果。</div>";
   return html;
 }
@@ -5006,12 +4987,6 @@ function checkRosterHeader(h) {
   }
 }
 
-function updateColHint() {}
-function selText(id) {
-  var s = q(id);
-  var op = s.options[s.selectedIndex];
-  return op ? op.textContent : "-";
-}
 
 /* ---------- 花名册 ---------- */
 function buildRosterMap() {
@@ -5098,7 +5073,14 @@ function renderManual() {
   dedupeManualMap();
   var m = loadMap(); var tb = q("#manualTbody"); tb.innerHTML = "";
   var keys = Object.keys(m);
-  if (!keys.length) { tb.innerHTML = '<tr><td colspan="7" class="muted">暂无人员映射记录，处理未匹配清单后会自动记录</td></tr>'; clampRows6("#manualScroll"); return; }
+  if (!keys.length) {
+    tb.innerHTML = '<tr><td colspan="7" class="muted">暂无人员映射记录，处理未匹配清单后会自动记录</td></tr>';
+    var emptyTip = q("#mapSearchTip");
+    if (emptyTip) emptyTip.textContent = "共 0 条";
+    fillTableRows("#manualTbody", SET_TABLE_MIN_ROWS);
+    clampRows6("#manualScroll");
+    return;
+  }
   var showed = 0;
   keys.forEach(function (no) {
     var it = m[no];
@@ -5119,33 +5101,18 @@ function renderManual() {
   if (!showed) tb.innerHTML = '<tr><td colspan="7" class="muted">没有匹配的记录，换个关键词试试</td></tr>';
   var tip = q("#mapSearchTip");
   if (tip) tip.textContent = mapKw ? ("共 " + keys.length + " 条，筛出 " + showed + " 条") : ("共 " + keys.length + " 条");
+  fillTableRows("#manualTbody", SET_TABLE_MIN_ROWS);
   clampRows6("#manualScroll");
 }
 function delManual(no) {
   var m = loadMap(); delete m[no]; saveMap(m); renderManual(); toast("已删除 " + no + " 的映射");
 }
 
-function refreshMapDeptSel() {
-  var sel = q("#selMapDept");
-  if (!sel) return;
-  var cur = sel.value;
-  var sInp = q("#mapDeptSearch");
-  sel.innerHTML = deptOptions(cur, sInp ? sInp.value : "");
-  if (cur) sel.value = cur;
-}
 /* 搜到只剩一个部门时直接选中，省一次点开下拉 */
 function autoPickSingleDept(sel) {
   if (!sel || sel.value) return;
   var real = Array.prototype.filter.call(sel.options, function (o) { return !!o.value; });
   if (real.length === 1) sel.value = real[0].value;
-}
-function onMapDeptSearch(v) {
-  var sel = q("#selMapDept");
-  if (!sel) return;
-  var cur = sel.value;
-  sel.innerHTML = deptOptions(cur, v);
-  if (cur) sel.value = cur;
-  autoPickSingleDept(sel);
 }
 function onEditMapDeptSearch(v) {
   var sel = q("#editMapDept");
@@ -5170,10 +5137,10 @@ function editManual(no) {
   if (sInp) sInp.value = "";
   sel.innerHTML = deptOptions(it.code || "", "");
   if (it.code) sel.value = it.code;
-  q("#modalEditMap").style.display = "flex";
+  showMask(q("#modalEditMap"));
 }
 
-function closeEditManual() { q("#modalEditMap").style.display = "none"; }
+function closeEditManual() { hideMask(q("#modalEditMap")); }
 
 function saveEditManual() {
   var no = q("#editMapNo").value.trim();
@@ -5211,10 +5178,23 @@ function saveEditManual() {
   toast("已更新映射：" + no + " -> " + d.name);
 }
 
+/* 人员映射新增行：可搜索下拉选中的部门编码 */
+function manualPickCode() {
+  var wrap = q("#dpMapDept");
+  return wrap ? String(wrap.getAttribute("data-code") || "").trim() : "";
+}
+function resetMapDeptPick() {
+  var wrap = q("#dpMapDept");
+  if (!wrap) return;
+  wrap.setAttribute("data-code", "");
+  var btn = wrap.querySelector(".dp-btn");
+  if (btn) btn.innerHTML = '<span class="dp-ph">搜索并选择部门</span> <span class="dp-arrow">▾</span>';
+}
+
 function addManual() {
   var no = q("#inpMapNo").value.trim();
   var nm = q("#inpMapName").value.trim();
-  var code = q("#selMapDept").value;
+  var code = manualPickCode();
   if (!no) { toast("请填写工号"); return; }
   if (!code) { toast("请选择部门"); return; }
   var d = findDeptByValue(code);
@@ -5238,8 +5218,7 @@ function addManual() {
 
   q("#inpMapNo").value = "";
   q("#inpMapName").value = "";
-  if (q("#mapDeptSearch")) q("#mapDeptSearch").value = "";
-  q("#selMapDept").value = "";
+  resetMapDeptPick();
   renderManual();
   renderAll();
   toast("已添加映射：" + no + " -> " + d.name);
@@ -5321,6 +5300,17 @@ function mapTemplate() {
   toast("模板已下载，按工号 / 姓名 / 部门编码三列填好再导入");
 }
 
+/* 清空部门映射：破坏性操作，二次确认 */
+function clearDept() {
+  var n = loadDept().length;
+  if (!n) { toast("还没有部门映射记录"); return; }
+  if (!confirm("确定清空全部 " + n + " 条部门映射？清空后要重新点「开始识别匹配」才会重算。")) return;
+  saveDept([]);
+  renderDept();
+  clampAllRows6();
+  toast("已清空 " + n + " 条部门映射");
+}
+
 function clearManual() {
   var m = loadMap(), n = Object.keys(m).length;
   if (!n) { toast("还没有人员映射记录"); return; }
@@ -5359,7 +5349,7 @@ function doMatch() {
     showWarn("花名册表头校验未通过，已停止识别", buildWarnBody(q("#rosterFileInfo").textContent.replace("文件：", ""), fieldState.roster.headers || [], [], []));
     return;
   }
-  if (!loadDept().length) { toast("请先在【设置】里维护部门编码和名称"); return; }
+  if (!loadDept().length) { toast("请先在【配置】里维护部门编码和名称"); return; }
   buildRosterMap();
 
   var h = Object.keys(billRaw[0]);
@@ -5769,7 +5759,7 @@ function resugAll() {
 }
 
 function closeBindDept() {
-  q("#modalBindDept").style.display = "none";
+  hideMask(q("#modalBindDept"));
   pendingBind = null;
 }
 
@@ -5827,10 +5817,10 @@ function askAddDeptMapping(path, d, label, after) {
     '<div class="mono" style="font-size:13px;color:var(--min-gray);word-break:break-all;margin:8px 0;">' + esc(p) + "</div>" +
     "绑到 <b>" + esc(d.acct || d.name) + "</b>（" + esc(d.code || "—") + "）？<br>" +
     '<span class="muted" style="font-size:13px;">确认绑定＝写入部门映射，下次同路径自动匹配；仅本次生效＝不写映射，下次还要再选。</span>';
-  q("#modalAddDept").style.display = "flex";
+  showMask(q("#modalAddDept"));
 }
 function closeAddDept() {
-  q("#modalAddDept").style.display = "none";
+  hideMask(q("#modalAddDept"));
   var p = pendingDeptAdd; pendingDeptAdd = null; return p;
 }
 /* 仅本次生效：不写部门映射，单据照常归入明细 */
@@ -5858,7 +5848,7 @@ function confirmAddDept() {
   if (after) after();
 }
 function closeDeptDlgSilently() {
-  q("#modalAddDept").style.display = "none";
+  hideMask(q("#modalAddDept"));
   pendingDeptAdd = null;
 }
 
@@ -6073,11 +6063,18 @@ function chooseDeptPick(code) {
   if (!dpWrap) return;
   var d = findDeptByValue(code);
   var wrap = dpWrap;
-  var plain = /pick-unmatch|pick-collect/.test(wrap.className);
+  var plain = /pick-unmatch|pick-collect|pick-manual/.test(wrap.className);
   if (d) {
     wrap.setAttribute("data-code", d.code);
     var btn = wrap.querySelector(".dp-btn");
     if (btn) btn.innerHTML = esc(deptLabelOf(d, plain)) + ' <span class="dp-arrow">▾</span>';
+    /* 配置 → 人员映射的新增行：只记下选择，等点「添加映射」再落配置 */
+    if (/pick-manual-new/.test(wrap.className)) {
+      closeDeptPick();
+      var noInp = q("#inpMapNo");
+      if (noInp && noInp.value.trim()) q("#inpMapName").focus();
+      return;
+    }
     if (wrap.getAttribute("data-valid") === "1") {
       var i = Number(wrap.getAttribute("data-idx"));
       changeValidDept(i, d.code);
@@ -6093,7 +6090,7 @@ function deptPickHtml(cls, idx, code, isValid) {
   var d = code ? findDeptByValue(code) : null;
   var plain = true; /* 三处清单的下拉统一只显示「核算组织名称（编码）」，不再带小组后缀 */
   return '<div class="dp-wrap ' + cls + '" data-idx="' + idx + '" data-code="' + esc(code || "") + '" data-valid="' + (isValid ? "1" : "0") + '">' +
-    '<button type="button" class="dp-btn" onclick="EXPRESS.toggleDeptPick(this)">' +
+    '<button  class="dp-btn" onclick="EXPRESS.toggleDeptPick(this)">' +
     (d ? esc(deptLabelOf(d, plain)) : '<span class="dp-ph">-- 选择部门 --</span>') + ' <span class="dp-arrow">▾</span></button></div>';
 }
 function deptOptions(selected, kw) {
@@ -6123,6 +6120,9 @@ function deptOptions(selected, kw) {
   return opts;
 }
 
+/* v1.92：清单里「工号」「姓名」按单行排版，姓名不再被挤成竖排 */
+var RESULT_COL_CLASS = { "工号": "rc-no", "姓名": "rc-name" };
+
 function renderTable(tab) {
   var thead = q("#resultThead");
   var tbody = q("#resultTbody");
@@ -6145,7 +6145,7 @@ function renderTable(tab) {
     });
     tip.textContent = "说明：部门汇总为自动计算，随「明细清单」的调整实时更新。";
   } else if (tab === "valid") {
-    heads = [ei >= 0 ? "工号" : "工号（花名册）", "姓名", "部门编码", "部门名称", "金额", "来源", "修改部门", "操作"];
+    heads = ["工号", "姓名", "部门编码", "部门名称", "金额", "来源", "修改部门", "操作"];
     validRows.forEach(function (r, i) {
       if (keyword && !matchRow(r.no, r.name, r.code, r.dept, typeText(r.type))) return;
       rows.push([
@@ -6156,7 +6156,7 @@ function renderTable(tab) {
     });
     tip.textContent = "说明：部门选择框可直接输入名称或编码检索，选好后立即重算汇总并写回本地配置；「移出」把该单据转到人工忽略清单。";
   } else if (tab === "unmatch") {
-    heads = ["工号（花名册）", "姓名", "人员类型", "未匹配原因", "金额", "选择部门", "操作"];
+    heads = ["工号", "姓名", "人员类型", "未匹配原因", "金额", "选择部门", "操作"];
     unmatchRows.forEach(function (r, i) {
       if (keyword && !matchRow(r.no, r.name, "", "", typeText(r.type))) return;
       /* 原因就是人员类型本身时（外包 / 公共账号 / 未知工号段），和左边那一列重复，统一显示「/」 */
@@ -6225,6 +6225,8 @@ function renderTable(tab) {
   heads.forEach(function (t) {
     var th = document.createElement("th");
     th.textContent = t;
+    var hc = RESULT_COL_CLASS[t];
+    if (hc) th.className = hc;
     htr.appendChild(th);
   });
   thead.appendChild(htr);
@@ -6239,8 +6241,10 @@ function renderTable(tab) {
 
   rows.forEach(function (r) {
     var tr = document.createElement("tr");
-    r.forEach(function (v) {
+    r.forEach(function (v, ci) {
       var td = document.createElement("td");
+      var cc = RESULT_COL_CLASS[heads[ci]];
+      if (cc) td.className = cc;
       if (typeof v === "string" && v.indexOf("<") === 0) td.innerHTML = v;
       else td.textContent = v;
       tr.appendChild(td);
@@ -6279,12 +6283,6 @@ function styleSnap(cell) {
   /* 深拷贝一份样式，跨工作簿赋值时不能共用对象 */
   try { return JSON.parse(JSON.stringify(cell.style || {})); } catch (e) { return {}; }
 }
-function styleSnapBorder(cell) {
-  var o = styleSnap(cell);
-  if (o.border) o.border = JSON.parse(JSON.stringify(o.border));
-  return o;
-}
-
 /* 复刻原账单样式导出：列宽、行高、表头底色 / 字体 / 边框、金额两位小数 */
 function exportStyled() {
   var fileName = fileStore.bill || "";
@@ -6478,9 +6476,11 @@ window.onload = function () {
 
   var masks = document.querySelectorAll("#tool-express .modal-mask");
   Array.prototype.forEach.call(masks, function (m) {
+    /* 初始隐藏的弹窗直接锁成 inert：不会存在「看不见但点得到」的状态 */
+    if (!m.classList.contains("is-show")) m.setAttribute("inert", "");
     /* 设置弹窗内容多、要反复改配置，只认「关闭」按钮，避免点到空白处被关掉、搜到一半丢状态 */
     if (m.id === "modalSettings") return;
-    m.onclick = function (e) { if (e.target === m) m.style.display = "none"; };
+    m.onclick = function (e) { if (e.target === m) hideMask(m); };
   });
 };
 
@@ -6507,38 +6507,8 @@ function cellCode(v){
   if (/^\d+(\.0+)+$/.test(t)) t = t.replace(/(\.0+)+$/, "");
   return t;
 }
-function normKey(v){
-  return cellText(v).toLowerCase().replace(/\s/g, "").replace(/[_\-:：()（）]/g, "");
-}
 var CODE_PAT = ["部门编码", "部门代码", "编码", "代码", "编号", "costcenter", "deptcode", "code"];
 var NAME_PAT = ["部门名称", "部门全称", "部门", "名称", "deptname", "name"];
-
-function findCol(headRow, pats, exclude){
-  var head = headRow.map(normKey), i, p;
-  for (i = 0; i < head.length; i++){
-    if (exclude.indexOf(i) > -1 || !head[i]) continue;
-    for (p = 0; p < pats.length; p++) if (head[i] === normKey(pats[p])) return i;
-  }
-  for (p = 0; p < pats.length; p++){
-    for (i = 0; i < head.length; i++){
-      if (exclude.indexOf(i) > -1 || !head[i]) continue;
-      if (head[i].indexOf(normKey(pats[p])) > -1) return i;
-    }
-  }
-  return -1;
-}
-
-function findColByKw(row, kws){
-  var clean = [];
-  var i, k;
-  for (i = 0; i < (row || []).length; i++) clean.push(String(row[i] == null ? "" : row[i]).replace(/\s/g, ""));
-  for (k = 0; k < kws.length; k++){
-    for (i = 0; i < clean.length; i++){
-      if (clean[i].indexOf(kws[k]) > -1) return i;
-    }
-  }
-  return -1;
-}
 
 /* 展开合并单元格：把左上角的值填进整块区域，避免合并的编码 / 路径列只读到一格 */
 function deptExpandMerges(sh){
@@ -6655,7 +6625,7 @@ function showDeptImportReport(rep){
   var mask = document.createElement("div");
   mask.className = "modal-mask";
   mask.id = "modalDeptReport";
-  mask.style.zIndex = "10070";
+  mask.style.zIndex = "var(--z-pop-dep)";
 
   var box = document.createElement("div");
   box.className = "modal";
@@ -6696,7 +6666,7 @@ function showDeptImportReport(rep){
   box.innerHTML = html;
   mask.appendChild(box);
   host.appendChild(mask);
-  mask.style.display = "flex";
+  showMask(mask);
   var okBtn = box.querySelector("button[data-act='ok']");
   var csvBtn = box.querySelector("button[data-act='csv']");
   if (okBtn) okBtn.addEventListener("click", function(){ mask.parentNode.removeChild(mask); });
@@ -6830,7 +6800,6 @@ function importDeptFile(input){
 
     renderDept();
     if (typeof renderAll === "function") renderAll();
-    if (typeof refreshMapDeptSel === "function") refreshMapDeptSel();
 
     if (rep.skipped.length || rep.dupCodes.length || rep.added === 0){
       showDeptImportReport(rep);
@@ -6960,7 +6929,7 @@ function handleWorkbook(kind) {
   if (!rows.length) { showHeaderMiss(kind, "工作表「" + (lay.sheet || "—") + "」读不到内容，可能选错了工作表。"); renderLayoutCfg(); return; }
   var objs = rowsToObjs(rows, hr);
   if (!objs.length) { showHeaderMiss(kind, "按第 " + hr + " 行当表头后，下面没有数据行。"); renderLayoutCfg(); return; }
-  if (q("#modalWarn") && q("#modalWarn").style.display === "flex") closeWarn();
+  if (maskOn(q("#modalWarn"))) closeWarn();
   if (kind === "bill") applyBillRows(objs, fileStore[kind] || "已上传");
   else applyRosterRows(objs, fileStore[kind] || "已上传");
   renderLayoutCfg();
@@ -7026,6 +6995,7 @@ function reparseAll() {
 window.EXPRESS = {
   skipAddDept: skipAddDept,
   addManual: addManual,
+  clearDept: clearDept,
   clearManual: clearManual,
   importMapFile: importMapFile,
   mapTemplate: mapTemplate,
@@ -7049,7 +7019,6 @@ window.EXPRESS = {
   bindDeptRow: bindDeptRow,
   closeBindDept: closeBindDept,
   applyAllSuggested: applyAllSuggested,
-  onMapDeptSearch: onMapDeptSearch,
   onEditMapDeptSearch: onEditMapDeptSearch,
   confirmAddDept: confirmAddDept,
   closeAddDept: closeAddDept,
@@ -7122,7 +7091,7 @@ window.EXPRESS = {
       <span>记住密码</span>
     </label>
     <div class="mt-err" id="mtLoginErr"></div>
-    <button type="button" class="mt-btn" id="mtLoginSubmit">登录</button>
+    <button  class="mt-btn" id="mtLoginSubmit">登录</button>
     <div class="mt-cancel" id="mtLoginClose">关闭</div>
   </div>
 </div>
@@ -7139,7 +7108,7 @@ window.EXPRESS = {
       <label>账号</label>
       <div class="mt-input"><input id="mtAcc" type="text" readonly></div>
     </div>
-    <button type="button" class="mt-btn" id="mtProfileSave">保存</button>
+    <button  class="mt-btn" id="mtProfileSave">保存</button>
     <div class="mt-cancel" id="mtProfileClose">关闭</div>
   </div>
 </div>
@@ -7163,7 +7132,7 @@ window.EXPRESS = {
       <div class="mt-err" id="mtCfErr">两次输入不一致</div>
     </div>
     <div class="mt-err" id="mtPwdErr"></div>
-    <button type="button" class="mt-btn" id="mtPwdSave">保存</button>
+    <button  class="mt-btn" id="mtPwdSave">保存</button>
     <div class="mt-cancel" id="mtPwdClose">关闭</div>
   </div>
 </div>
@@ -7516,16 +7485,6 @@ window.EXPRESS = {
   }
 
   /* ---------- 会话 ---------- */
-  function applySession(session){
-    mtUid = session.user.id;
-    mtEmail = session.user.email || "";
-    $("mtLoginTrigger").style.display = "none";
-    $("mtAvatarWrap").style.display = "block";
-    paintAvatar();
-    setDdState();
-    return hydrate(mtUid);
-  }
-
   function loadProfile(){
     if (!mtUid || !mtClient) return;
     mtClient.from("profiles").select("nickname").eq("id", mtUid).then(function(res){
@@ -7600,7 +7559,7 @@ window.EXPRESS = {
       if (document.getElementById("depWarnBox")) return;
       var box = document.createElement("div");
       box.id = "depWarnBox";
-      box.style.cssText = "position:fixed;left:16px;right:16px;bottom:16px;z-index:99999;" +
+      box.style.cssText = "position:fixed;left:16px;right:16px;bottom:16px;z-index:var(--z-tip-bottom);" +
         "background:#fff8e1;border:1px solid #ffe08a;color:#7a5b00;padding:12px 14px;" +
         "border-radius:8px;font-size:13px;line-height:1.8;box-shadow:0 6px 20px rgba(0,0,0,.12)";
       box.innerHTML = "<b>Excel 解析库未加载</b><br>" +
@@ -7639,8 +7598,9 @@ window.EXPRESS = {
     var cs = getComputedStyle(cur);
     var pl = parseFloat(cs.paddingLeft) || 0;
     var pr = parseFloat(cs.paddingRight) || 0;
-    ind.style.left = (cur.offsetLeft + pl) + 'px';
-    ind.style.width = Math.max(0, cur.offsetWidth - pl - pr) + 'px';
+    var x = cur.offsetLeft + pl;
+    var w = Math.max(1, cur.offsetWidth - pl - pr);
+    ind.style.transform = 'translateX(' + x + 'px) scaleX(' + w + ')';
     if (!ind.classList.contains('is-ready')) ind.classList.add('is-ready');
     ind.style.opacity = '1';
   }
@@ -7675,6 +7635,11 @@ window.EXPRESS = {
   }
   if (document.readyState === 'complete') init();
   else window.addEventListener('load', init);
+
+  /* 首屏入场动画播完（0.5s）后打标记：之后表格重建不再重播入场动画，避免翻页/查询时闪一下 */
+  setTimeout(function () {
+    document.documentElement.classList.add('calm-table');
+  }, 560);
 })();
 </script>
 </body>
