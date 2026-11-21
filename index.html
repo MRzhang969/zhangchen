@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -37,6 +37,12 @@
         box-sizing: border-box;
         margin: 0;
         padding: 0;
+    }
+    /* 固定预留滚动条占位：切到内容更矮的页面时滚动条消失，可视宽度会突变，
+       居中的导航、LOGO 会整体横移；这里始终保留滚动条槽位，宽度恒定 */
+    html {
+        overflow-y: scroll;
+        scrollbar-gutter: stable;
     }
     body {
         min-height: 100vh;
@@ -182,6 +188,13 @@
         gap: 10px;
         flex-wrap: wrap;
     }
+    /* 弹窗底部操作条：统一右下角 */
+    .btn-group.foot-bar {
+        justify-content: flex-end;
+        margin: 18px 0 0;
+        padding-top: 14px;
+        border-top: 1px dashed var(--min-line);
+    }
     button {
         padding: 10px 18px;
         border: 1px solid var(--min-line);
@@ -261,7 +274,10 @@
     }
     input[type="text"],
     select {
-        padding: 10px 12px;
+        height: 36px;
+        box-sizing: border-box;
+        padding: 0 10px;
+        line-height: 1;
         border: 1px solid var(--min-line);
         border-radius: var(--min-radius);
         background: var(--min-white);
@@ -290,12 +306,14 @@
     
     th,
     td {
-        padding: 12px 14px;
+        padding: 7px 12px;
+        line-height: 1.45;
         text-align: center;
         border-bottom: 1px solid var(--min-line);
         border-right: 1px solid var(--min-line);
     }
     th {
+        padding: 9px 12px;
         background: var(--min-tag);
         color: var(--min-black);
         font-weight: 700;
@@ -439,6 +457,237 @@
         border: none;
         border-radius: 50%;
     }
+    /* 板块配置：transitions.dev Accordion，点名字在面板内直接展开编辑表单（不弹窗、无箭头） */
+    :root {
+        --t-acc-dur: 280ms;
+        --t-acc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .cfg-accordion {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 12px 0 4px;
+    }
+    .cfg-acc-item {
+        border: 1px solid var(--min-line);
+        border-radius: var(--min-radius);
+        background: var(--min-white);
+        box-shadow: var(--shadow-1);
+        overflow: hidden;
+        transition: box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .cfg-acc-item:hover {
+        box-shadow: var(--shadow-2);
+        border-color: #ddd;
+    }
+    .cfg-acc-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .cfg-acc-title {
+        font-weight: 700;
+        letter-spacing: 2px;
+        font-size: 14px;
+    }
+    .cfg-acc-panel {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows var(--t-acc-dur) var(--t-acc-ease);
+    }
+    .cfg-acc-item[aria-expanded="true"] .cfg-acc-panel {
+        grid-template-rows: 1fr;
+    }
+    .cfg-acc-panel-inner {
+        overflow: hidden;
+    }
+    .cfg-acc-body {
+        padding: 0 16px;
+        transition: padding var(--t-acc-dur) var(--t-acc-ease);
+    }
+    .cfg-acc-item[aria-expanded="true"] .cfg-acc-body {
+        padding: 0 16px 16px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .cfg-acc-panel,
+        .cfg-acc-body {
+            transition: none !important;
+        }
+    }
+    /* 面板内联表单：紧凑分组布局 */
+    .pl-inline {
+        padding-top: 4px;
+        border-top: 1px dashed var(--min-line);
+    }
+    .pl-row {
+        margin: 0 0 10px;
+    }
+    .pl-row label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--min-dark);
+        margin-bottom: 4px;
+    }
+    .pl-hint {
+        font-weight: 400;
+        font-size: 12px;
+        letter-spacing: 0;
+        color: var(--min-gray);
+        margin-left: 4px;
+    }
+    .pl-row input {
+        width: 100%;
+        box-sizing: border-box;
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid var(--min-line);
+        border-radius: var(--min-radius);
+        background: var(--min-white);
+        font-size: 13px;
+        outline: none;
+        box-shadow: var(--shadow-1);
+    }
+    /* 名称 / 优先级 / 默认负责人 三个短框并排 */
+    .pl-row-flex {
+        display: flex;
+        gap: 14px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin: 0 0 10px;
+    }
+    .pl-row-flex .pl-cell {
+        display: flex;
+        flex-direction: column;
+    }
+    .pl-cell label {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--min-dark);
+        margin-bottom: 4px;
+    }
+    .pl-w-name { flex: 0 0 170px; max-width: 170px; }
+    .pl-w-pri  { flex: 0 0 100px; max-width: 100px; }
+    .pl-w-owner{ flex: 0 0 160px; max-width: 160px; }
+    .pl-w-item { flex: 0 0 140px; max-width: 140px; }
+    .pl-sub {
+        margin: 14px 0 0;
+        padding-top: 12px;
+        border-top: 1px dashed var(--min-line);
+    }
+    .pl-sub-title {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+    .pl-empty {
+        font-size: 12px;
+        color: var(--min-gray);
+        padding: 4px 0;
+    }
+    /* 一行紧凑操作条：短框 + 长框 + 按钮 */
+    .pl-line {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .pl-line input {
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid var(--min-line);
+        border-radius: var(--min-radius);
+        background: var(--min-white);
+        font-size: 13px;
+        outline: none;
+        box-shadow: var(--shadow-1);
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .pl-line .pl-w-item { width: 140px; flex: 0 0 140px; }
+    .pl-line .pl-grow { flex: 1 1 auto; }
+    .pl-line button { flex: 0 0 auto; height: 36px; padding: 0 14px; }
+    .pl-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+    }
+    .pl-saved {
+        font-size: 12px;
+        color: var(--min-gray);
+        letter-spacing: 1px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    .pl-saved.show {
+        opacity: 1;
+    }
+    /* 板块卡片：只保留标题与操作，风格紧凑 */
+    .cfg-plate-card {
+        border: 1px solid var(--min-line);
+        border-radius: var(--min-radius);
+        padding: 14px 16px;
+        margin: 10px 0;
+        background: var(--min-white);
+        box-shadow: var(--shadow-1);
+        transition: box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .cfg-plate-card:hover {
+        box-shadow: var(--shadow-2);
+        border-color: #ddd;
+    }
+    .cfg-plate-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .cfg-plate-head .p-name {
+        font-weight: 700;
+        letter-spacing: 2px;
+        font-size: 14px;
+    }
+    /* 新增板块弹窗表单 */
+    .np-modal .np-form {
+        padding: 4px 2px 0;
+    }
+    .np-modal .np-form .modal-row {
+        margin: 20px 0;
+    }
+    .np-modal .np-form .modal-row input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .np-modal .np-hint {
+        font-weight: 400;
+        font-size: 12px;
+        letter-spacing: 0;
+        color: var(--min-gray);
+        margin-left: 4px;
+    }
+    .np-modal .np-pri {
+        max-width: 120px;
+    }
+    .np-modal .np-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 26px;
+        padding-top: 18px;
+        border-top: 1px solid var(--min-line);
+    }
     .tag {
         display: inline-block;
         background: var(--min-white);
@@ -463,10 +712,12 @@
     .preview-table td {
         border-bottom: 1px solid var(--min-line);
         border-right: 1px solid var(--min-line);
-        padding: 10px;
+        padding: 6px 8px;
         font-size: 13px;
+        line-height: 1.4;
     }
     .preview-table th {
+        padding: 8px 8px;
         background: var(--min-tag);
         color: var(--min-black);
         font-weight: 700;
@@ -519,7 +770,7 @@
         margin: 16px 0;
     }
     .btn-mini {
-        padding: 7px 12px;
+        padding: 5px 10px;
         font-size: 12px;
         border: 1px solid var(--min-line);
         border-radius: var(--min-radius);
@@ -567,6 +818,12 @@
         z-index: 80;
         background: var(--min-white);
         border-bottom: 1px solid var(--min-line);
+        transition: box-shadow .25s ease, border-color .25s ease;
+    }
+    /* 滚动超过 8px 出现柔和阴影，回到顶部消失 */
+    .site-nav.is-scrolled {
+        box-shadow: 0 4px 16px rgba(17, 24, 39, .07), 0 1px 3px rgba(17, 24, 39, .05);
+        border-bottom-color: transparent;
     }
     .site-nav-in {
         max-width: 1240px;
@@ -618,6 +875,7 @@
         white-space: nowrap;
     }
     .site-links {
+        position: relative;
         display: flex;
         align-items: center;
         gap: 4px;
@@ -628,11 +886,29 @@
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
+    /* 共用一条滑动下划线 */
+    .nav-indicator {
+        position: absolute;
+        left: 0;
+        bottom: 3px;
+        width: 0;
+        height: 2px;
+        background: var(--min-black);
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0;
+    }
+    .nav-indicator.is-ready {
+        opacity: 1;
+        transition: left .26s cubic-bezier(.4, 0, .2, 1),
+                    width .26s cubic-bezier(.4, 0, .2, 1);
+    }
     .site-links::-webkit-scrollbar {
         display: none;
     }
     .site-link {
         position: relative;
+        z-index: 1;
         flex: none;
         -webkit-tap-highlight-color: transparent;
         padding: 9px 9px;
@@ -651,13 +927,7 @@
         color: var(--min-black);
     }
     .site-link[aria-current="page"]::after {
-        content: "";
-        position: absolute;
-        left: 9px;
-        right: 9px;
-        bottom: 3px;
-        height: 2px;
-        background: var(--min-black);
+        content: none;
     }
     .site-link:focus-visible {
         outline: 2px solid var(--min-black);
@@ -695,6 +965,13 @@
     .site-links .site-link:nth-child(4) {
         animation-delay: .32s;
     }
+    /* 首次入场动画播完后打上 nav-steady：之后路由切换不再重播，避免位移导致下划线错位 */
+    .site-nav.nav-steady .site-brand,
+    .site-nav.nav-steady .site-link {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
     @media (prefers-reduced-motion: reduce) {
         .site-brand,
         .site-link {
@@ -729,10 +1006,7 @@
             padding: 9px 5px;
             letter-spacing: .5px;
         }
-        .site-link[aria-current="page"]::after {
-            left: 5px;
-            right: 5px;
-        }
+        /* 小屏同样共用滑条 */
     }
 
     .view[hidden] {
@@ -1115,6 +1389,10 @@
         color: var(--min-black);
         line-height: 1.5;
     }
+    .log-body h3 + h3,
+    .log-body ul + h3 {
+        margin-top: 24px;
+    }
     .log-tag {
         display: inline-block;
         margin-left: 8px;
@@ -1216,6 +1494,39 @@
         }
     }
 
+    /* 台账分页控件 */
+    .pager {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 4px 0 8px;
+        padding-top: 12px;
+        border-top: 1px solid var(--min-line);
+    }
+    .pager-info {
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: var(--min-gray);
+    }
+    .pager-btns {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pager-num {
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: var(--min-dark);
+        min-width: 56px;
+        text-align: center;
+    }
+    .pager button:disabled {
+        opacity: 0.38;
+        cursor: not-allowed;
+    }
+
     /* 视图切换：每次进入都重播一次入场动画（首页与工具/文档/日志一致） */
     .container.view-in {
         --in-y: 10px;
@@ -1277,7 +1588,7 @@
     border-color:var(--min-black);box-shadow:var(--shadow-2);
 }
 #tool-express button:active{transform:translateY(1px);box-shadow:var(--shadow-1);}
-#tool-express button.btn-mini{padding:7px 12px;font-size:12px;letter-spacing:1px;}
+#tool-express button.btn-mini{padding:5px 10px;font-size:12px;letter-spacing:1px;}
 /* 配色变体：必须保留。上面的 #tool-express button 是「ID + 元素」选择器，权重高于全局 button.primary，
    若不在此声明，主按钮会被基按钮的白底样式盖掉。 */
 #tool-express button.primary{background:var(--min-black);color:var(--min-white);border-color:var(--min-black);}
@@ -1291,12 +1602,12 @@
 #tool-express button.info{background:var(--min-white);color:var(--min-dark);border-color:var(--min-line);}
 #tool-express button.info:hover{background:var(--min-tag);color:var(--min-black);}
 
-/* 表单控件：模块内统一 44px 高（全局为内容撑开，此处是差异样式） */
+/* 表单控件：模块内统一 36px 高（全局为内容撑开，此处是差异样式） */
 #tool-express input[type="file"]{display:none;}
 #tool-express input[type="text"],
 #tool-express input[type="number"],
 #tool-express select{
-    height:44px;box-sizing:border-box;padding:0 12px;
+    height:36px;box-sizing:border-box;padding:0 10px;
     border:1px solid var(--min-line);border-radius:var(--min-radius);
     background:var(--min-white);font-size:14px;outline:none;
     box-shadow:var(--shadow-1);
@@ -1390,12 +1701,23 @@
 #tool-express .preview-table th,
 #tool-express .preview-table td{
     border-bottom:1px solid var(--min-line);border-right:1px solid var(--min-line);
-    padding:9px;font-size:13px;text-align:center;white-space:nowrap;
+    padding:6px 8px;font-size:13px;line-height:1.4;text-align:center;white-space:nowrap;
 }
+#tool-express .preview-table th{padding:8px;}
 #tool-express .preview-table th{background:var(--min-tag);font-weight:700;letter-spacing:1px;}
 
 /* 表单行 / 字段 */
 #tool-express .field-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;}
+/* 字段识别三组：固定 4 列一行，和导入表结构对齐 */
+#tool-express .field-row-4{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;align-items:end;
+}
+#tool-express .field-row-4 .field{flex:none;width:100%;min-width:0;margin:0;}
+#tool-express .field-row-4 .field input{width:100%;box-sizing:border-box;}
+@media (max-width:820px){
+    #tool-express .field-row-4{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
 #tool-express #deptTbody tr.row-editing td{background:#fff8e6;}
 #tool-express .field{flex:1 1 200px;margin:6px 0;min-width:0;}
 #tool-express .field label{
@@ -1428,8 +1750,15 @@
 
 /* 滚动容器 */
 #tool-express .scroll{max-height:520px;overflow:auto;-webkit-overflow-scrolling:touch;}
-#tool-express .scroll::-webkit-scrollbar{height:10px;}
+#tool-express .scroll::-webkit-scrollbar{height:10px;width:10px;}
 #tool-express .scroll::-webkit-scrollbar-thumb{background:#c9c9c9;border-radius:5px;}
+/* v1.81：部门映射 / 人员映射 / 人员类型 表格固定只显示 6 行，超出走容器内滚动 */
+#tool-express .scroll-rows6{position:relative;overflow-y:auto;}
+#tool-express .scroll-rows6::-webkit-scrollbar{width:8px;height:8px;}
+#tool-express .scroll-rows6::-webkit-scrollbar-track{background:transparent;}
+#tool-express .scroll-rows6::-webkit-scrollbar-thumb{background:#dedede;border-radius:4px;}
+#tool-express .scroll-rows6:hover::-webkit-scrollbar-thumb{background:#c2c2c2;}
+#tool-express .scroll-rows6.has-more{box-shadow:inset 0 -14px 14px -12px rgba(0,0,0,.14);}
 
 /* 分组 / 汇总 */
 #tool-express .group-title{
@@ -1847,6 +2176,7 @@ function mtCloudPush(key){
       <a class="site-link" href="#/tools" data-nav="tools">工具集</a>
       <a class="site-link" href="#/docs" data-nav="docs">使用文档</a>
       <a class="site-link" href="#/log" data-nav="log">更新日志</a>
+      <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
     </div>
     <div class="mt-user" id="mtUser">
       <button type="button" class="mt-login-btn" id="mtLoginTrigger">登录</button>
@@ -1929,7 +2259,7 @@ function mtCloudPush(key){
     </div>
     <div class="search-area">
         <span style="font-weight:700;letter-spacing:2px;">搜索：</span>
-        <input type="text" id="searchVal" placeholder="搜索问题描述 / 板块 / 负责人" oninput="renderTable()">
+        <input type="text" id="searchVal" placeholder="搜索关键词、负责人、日期" oninput="onLedgerSearch()">
     </div>
     <div class="tbl-scroll">
         <table>
@@ -1946,6 +2276,14 @@ function mtCloudPush(key){
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
+    </div>
+    <div class="pager" id="pagerWrap">
+        <span class="pager-info" id="pagerInfo"></span>
+        <div class="pager-btns">
+            <button class="btn-mini" id="pagerPrev" onclick="gotoPage(pageIdx-1)">上一页</button>
+            <span class="pager-num" id="pagerNum"></span>
+            <button class="btn-mini" id="pagerNext" onclick="gotoPage(pageIdx+1)">下一页</button>
+        </div>
     </div>
 </div>
 
@@ -2024,88 +2362,51 @@ function mtCloudPush(key){
         <div class="btn-group">
             <button class="info" onclick="exportCfg()">导出配置</button>
             <button class="info" onclick="document.getElementById('cfgImport').click()">导入配置</button>
+            <button class="primary" onclick="openNewPlateMask()">新增板块</button>
             <input type="file" id="cfgImport" accept=".json">
         </div>
         <div class="cfg-block">
             <h4>板块配置</h4>
             <div id="plateListWrap"></div>
-            <hr>
-            <h4 style="font-size:14px;font-weight:700;letter-spacing:2px;">新增板块</h4>
+        </div>
+        <div class="btn-group foot-bar">
+            <button class="info" onclick="closeCfgMask()">关闭</button>
+        </div>
+    </div>
+</div>
+<!-- 新增板块弹窗 -->
+<div class="modal-mask" id="newPlateMask">
+    <div class="modal t-modal np-modal" style="width:640px;" role="dialog" aria-modal="true" aria-label="新增板块">
+        <h3>新增板块</h3>
+        <div class="np-form">
             <div class="modal-row">
                 <label>板块名称</label>
                 <input type="text" id="newPlateName">
             </div>
             <div class="modal-row">
-                <label>板块识别关键词（逗号分隔）</label>
+                <label>板块识别关键词 <span class="np-hint">逗号分隔</span></label>
                 <input type="text" id="newPlateKw">
             </div>
             <div class="modal-row">
-                <label>优先级（数字越小优先级越高）</label>
-                <input type="number" id="newPlatePri" value="10">
+                <label>优先级 <span class="np-hint">数字越小优先级越高</span></label>
+                <input type="number" id="newPlatePri" value="10" class="np-pri">
             </div>
             <div class="modal-row">
-                <label>负责人列表（逗号分隔）</label>
+                <label>负责人列表 <span class="np-hint">逗号分隔</span></label>
                 <input type="text" id="newPlateOwners">
             </div>
             <div class="modal-row">
                 <label>默认负责人</label>
                 <input type="text" id="newPlateDefOwner">
             </div>
-            <button class="primary" onclick="addPlate()">新增板块</button>
-        </div>
-        <div class="btn-group">
-            <button class="info" onclick="closeCfgMask()">关闭</button>
+            <div class="np-actions">
+                <button class="primary" onclick="addPlate()">新增板块</button>
+                <button class="info" onclick="closeNewPlateMask()">取消</button>
+            </div>
         </div>
     </div>
 </div>
 <!-- 板块编辑弹窗 -->
-<div class="modal-mask" id="editPlateMask">
-    <div class="modal t-modal" style="width:740px;" role="dialog" aria-modal="true" aria-label="编辑板块">
-        <h3>编辑板块</h3>
-        <div class="modal-row">
-            <label>板块名称</label>
-            <input type="text" id="epName">
-        </div>
-        <div class="modal-row">
-            <label>板块关键词（逗号分隔）</label>
-            <input type="text" id="epKw">
-        </div>
-        <div class="modal-row">
-            <label>优先级</label>
-            <input type="number" id="epPri">
-        </div>
-        <div class="modal-row">
-            <label>负责人列表（逗号分隔）</label>
-            <input type="text" id="epOwners">
-        </div>
-        <div class="modal-row">
-            <label>默认负责人</label>
-            <input type="text" id="epDefOwner">
-        </div>
-        <div class="modal-row">
-            <h4 style="font-size:14px;font-weight:700;letter-spacing:2px;">板块下属重点项</h4>
-            <div id="epItemWrap"></div>
-            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="text" id="epNewItemName" placeholder="重点项名称">
-                <input type="text" id="epNewItemKw" placeholder="关键词，逗号分隔">
-                <button onclick="addPlateInnerItem()">添加重点项</button>
-            </div>
-        </div>
-        <div class="modal-row">
-            <h4 style="font-size:14px;font-weight:700;letter-spacing:2px;">楼层负责人映射</h4>
-            <div id="epFloorOwnerWrap"></div>
-            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="text" id="epNewFloorKw" placeholder="楼层关键字，逗号分隔">
-                <input type="text" id="epNewFloorOwner" placeholder="对应负责人">
-                <button onclick="addPlateFloorMap()">添加楼层映射</button>
-            </div>
-        </div>
-        <div class="btn-group">
-            <button class="primary" onclick="saveEditPlate()">保存板块</button>
-            <button class="info" onclick="closeEditPlateMask()">取消</button>
-        </div>
-    </div>
-</div>
 </div>
 <div id="tool-express" hidden>
 <div class="container">
@@ -2136,14 +2437,10 @@ function mtCloudPush(key){
     <h4>② 上传人员花名册（运单号 - 工号 - 姓名 - 部门全称）</h4>
     <div id="dropRoster" class="drop-area">
       <div>点击选择，或把人员名单拖到这里</div>
-      <div style="font-size:12px;color:var(--min-gray);margin-top:6px;">花名册部门列填「行政组织名称」（完整路径），先按完整路径去部门映射里对，对不上再依次砍掉最前面一级继续找；有「运单号」列时会先按运单号认人，同名同姓也能分开</div>
+      <div style="font-size:12px;color:var(--min-gray);margin-top:6px;">支持 xlsx / xls / csv</div>
     </div>
     <input type="file" id="fileRoster" accept=".xlsx,.xls,.csv" style="display:none;">
     <div class="file-info" id="rosterFileInfo"></div>
-    <div style="margin-top:12px;font-size:12px;color:var(--min-gray);">
-      数据运算异常？
-      <a href="javascript:void(0)" onclick="EXPRESS.loadDemo()" style="color:var(--min-black);font-weight:700;text-decoration:underline;">点这里载入演示数据排查一下</a>
-    </div>
   </div>
 
   <div class="action-bar">
@@ -2266,12 +2563,11 @@ function mtCloudPush(key){
     </div>
 
     <div id="setPaneDept">
-      <div class="muted" style="font-size:12px;margin-bottom:10px;line-height:1.8;">一条记录三个字段，按公司给的核算对照表填：核算组织编码、行政组织名称、核算组织名称。匹配按「/」层级逐级比对：先整条路径比，对不上就砍掉最前面一级再比，直到只剩两级；仍对不上才算未找到部门。行政组织名称不能重复，核算组织编码可以多条共用（多个分部门归同一个核算组织时填同一个编码）。</div>
       <div class="btn-group" style="align-items:center;margin-bottom:10px;">
         <input type="text" id="inpDeptSearch" placeholder="搜索：编码 / 行政组织名称 / 核算组织名称" style="flex:1 1 320px;" oninput="EXPRESS.onDeptSearch(this.value)">
         <span class="muted" id="deptSearchTip" style="font-size:12px;"></span>
       </div>
-      <div class="scroll">
+      <div class="scroll scroll-rows6" id="deptScroll">
         <table class="preview-table">
           <thead><tr><th style="width:150px;">核算组织编码</th><th>行政组织名称</th><th>核算组织名称</th><th style="width:150px;">操作</th></tr></thead>
           <tbody id="deptTbody"></tbody>
@@ -2298,7 +2594,7 @@ function mtCloudPush(key){
         <input type="text" id="inpMapSearch" placeholder="搜索：工号 / 姓名 / 部门编码 / 部门名称" style="flex:1 1 320px;" oninput="EXPRESS.onMapSearch(this.value)">
         <span class="muted" id="mapSearchTip" style="font-size:12px;"></span>
       </div>
-      <div class="scroll">
+      <div class="scroll scroll-rows6" id="manualScroll">
         <table class="preview-table">
           <thead><tr><th>工号</th><th>姓名</th><th>人员类型</th><th>部门编码</th><th>部门名称</th><th>最后编辑</th><th>操作</th></tr></thead>
           <tbody id="manualTbody"></tbody>
@@ -2322,21 +2618,19 @@ function mtCloudPush(key){
     </div>
 
     <div id="setPaneFields" class="hide">
-      <div class="group-tip" style="margin-bottom:12px;">系统按表头名称自动识别；表头名称不一致时，在这里手动选择对应列，再点「开始识别匹配」。</div>
       <div class="group-box">
         <div class="group-title">导入表结构（工作表与表头行）</div>
-        <div class="field-row">
+        <div class="field-row field-row-4">
           <div class="field"><label>账单工作表</label><select id="selBillSheet" onchange="EXPRESS.changeSheetCfg('bill', this.value)"></select></div>
-          <div class="field" style="max-width:170px;"><label>账单表头在第几行</label><input type="number" id="inpBillHeadRow" min="1" value="2" onchange="EXPRESS.changeHeadRowCfg('bill', this.value)"></div>
+          <div class="field"><label>账单表头在第几行</label><input type="number" id="inpBillHeadRow" min="1" value="2" onchange="EXPRESS.changeHeadRowCfg('bill', this.value)"></div>
           <div class="field"><label>花名册工作表</label><select id="selRosterSheet" onchange="EXPRESS.changeSheetCfg('roster', this.value)"></select></div>
-          <div class="field" style="max-width:170px;"><label>花名册表头在第几行</label><input type="number" id="inpRosterHeadRow" min="1" value="1" onchange="EXPRESS.changeHeadRowCfg('roster', this.value)"></div>
+          <div class="field"><label>花名册表头在第几行</label><input type="number" id="inpRosterHeadRow" min="1" value="1" onchange="EXPRESS.changeHeadRowCfg('roster', this.value)"></div>
         </div>
-        <div class="group-tip" style="margin-top:8px;">左边两个下拉用来选读哪一张工作表（上传后自动列出该文件里的全部 sheet），右边两个数字框是表头在第几行。默认账单表头在第 2 行、花名册第 1 行；上传时不再弹窗选表，读不出表头就在这里改，然后点「按当前设置重新解析」。</div>
         <div style="margin-top:10px;"><button class="primary btn-mini" onclick="EXPRESS.reparseAll()">按当前设置重新解析</button></div>
       </div>
       <div class="group-box">
         <div class="group-title">顺丰账单</div>
-        <div class="field-row">
+        <div class="field-row field-row-4">
           <div class="field"><label>运费金额</label><select id="selAmt"></select></div>
           <div class="field"><label>付款方式</label><select id="selPay"></select></div>
           <div class="field"><label>寄件人姓名</label><select id="selName"></select></div>
@@ -2345,7 +2639,7 @@ function mtCloudPush(key){
       </div>
       <div class="group-box">
         <div class="group-title">人员花名册</div>
-        <div class="field-row">
+        <div class="field-row field-row-4">
           <div class="field"><label>员工工号</label><select id="selRostEmp"></select></div>
           <div class="field"><label>员工姓名</label><select id="selRostName"></select></div>
           <div class="field"><label>行政组织名称（花名册完整路径）</label><select id="selRostDept"></select></div>
@@ -2357,8 +2651,7 @@ function mtCloudPush(key){
 
     <div id="setPaneRules" class="hide">
       <div class="group-title">工号类型规则（从上到下依次匹配，第一条命中即生效）</div>
-      <div class="group-tip" style="margin-bottom:10px;">前缀规则优先于长度规则，从上到下依次判断；花名册出现新的工号段（如 S 开头外包），在这里加一条即可。</div>
-      <div class="scroll">
+      <div class="scroll scroll-rows6" id="rulesScroll">
         <table class="preview-table">
           <thead><tr><th style="width:150px;">匹配方式</th><th style="width:140px;">值</th><th>类型名称</th><th style="width:150px;">是否外包/供应商</th><th style="width:190px;">操作</th></tr></thead>
           <tbody id="rulesTbody"></tbody>
@@ -2377,8 +2670,7 @@ function mtCloudPush(key){
           <option value="0">计入内部员工</option>
           <option value="1">需人工确认（外包/供应商）</option>
         </select>
-        <button class="primary btn-mini" onclick="EXPRESS.addRule()">添加规则</button>
-        <button class="info btn-mini" onclick="EXPRESS.resetRules()">载入示例规则</button>
+        <button class="primary btn-mini" id="btnAddRule" onclick="EXPRESS.addRule()">添加规则</button>
       </div>
       <div class="group-tip">提示：默认不带任何规则，需要按贵司工号规则自己添加（例如「前缀 W → 外包」或「工号长度 8 → 内部员工」）。规则表从上到下依次判断、第一条命中即生效，所以前缀规则要排在长度规则前面。改动规则后需要重新点「开始识别匹配」才会重新分类。</div>
     </div>
@@ -2400,7 +2692,7 @@ function mtCloudPush(key){
     </div>
 
     <hr>
-    <div class="btn-group">
+    <div class="btn-group foot-bar">
       <button class="info" onclick="EXPRESS.closeSettings()">关闭</button>
     </div>
   </div>
@@ -2473,6 +2765,7 @@ function mtCloudPush(key){
       <h3><i>02</i>校对与同步时间</h3>
       <p>识别结果进预览弹窗，默认时间取当天。如果这批其实是昨天登记的，先改第一行的时间，再点“同步时间”，所有行一起变成这个值。</p>
       <div class="doc-tip">第一行留空时同步不会执行，会提示先填第一行。同步只改时间，不覆盖已选好的板块和负责人。</div>
+      <p>台账列表能按关键词、负责人、日期三样一起搜：日期直接写 <b>2026-11-18</b>、<b>11-18</b>、<b>2026-11</b>、<b>11.18</b> 都认，也可以「关键词 + 日期」混着输（如「工程 11-18」）；识别不出日期时自动按普通文本搜索。列表默认每页 10 条，底部「上一页 / 下一页」翻页，换搜索词后自动回到第 1 页。</p>
     </div>
 
     <div class="doc-entry" id="d3">
@@ -2481,7 +2774,8 @@ function mtCloudPush(key){
       <ul>
         <li>关键词逗号分隔，匹配用的是文本包含，短词容易误判，尽量用具体词；</li>
         <li>优先级 1 最优先，新板块默认 10，越靠后越不会被别的板块抢走；</li>
-        <li>配置可导出成 json，换电脑时导入即可，不必重配一遍。</li>
+        <li>配置可导出成 json，换电脑时导入即可，不必重配一遍；</li>
+        <li>新增板块点配置面板右上「新增板块」按钮（在「导入配置」右侧），在弹出的表单里填完保存即可；板块卡片只显示名称和「编辑 / 删除」，具体字段点「编辑板块」进去改。</li>
       </ul>
     </div>
 
@@ -2550,7 +2844,6 @@ function mtCloudPush(key){
           <li>花名册上传：放「② 上传人员花名册」，需要员工工号、员工姓名、行政组织名称三列；花名册自带运单号时，也到设置里把「运单号」指定出来；</li>
           <li>表头默认：账单默认把第 2 行当表头（顺丰原表第 1 行是合并大标题），花名册默认第 1 行，上传后直接解析，不弹窗问你选表；</li>
           <li>上传后区域下方会显示读到的行数与表头行，想确认读对没有，先看这一行；读不出表头（换个表头行、表里有多张工作表）会弹提醒，点「去字段识别」跳到设置，改工作表或表头行号，再点「按当前设置重新解析」；</li>
-          <li>没有真实表格也能先试：点「这里载入演示数据排查一下」，会填一套 12 条账单 + 8 人花名册，跑完能看清整个流程；</li>
           <li>花名册只认「行政组织名称」这一列：拿完整路径去「设置 → 部门映射」里对同一字段，对上就直接取该行的核算组织编码与核算组织名称，花名册不用写编码；路径首尾多写的「/」、连续「//」会自动忽略。顺丰导出的路径和公司对照表层级不一致时，会逐级砍掉最前面一级再比对，最多砍到只剩两级，仍然对不上才进未匹配、原因显示「未找到部门」。</li>
         </ul>
       </div>
@@ -2599,7 +2892,7 @@ function mtCloudPush(key){
           <li>部门映射批量导入：公司给了核算对照表就点「批量导入映射表」，读三列的 Excel / CSV，单元格里的全角空格、不换行空格、零宽字符、多余换行会自动清洗，合并单元格会按左上角展开，表头最多往下找 20 行，工作表也会自动挑带这些列名的那张；同一「行政组织名称」更新内容，新路径追加，空行跳过；导入完弹窗给出读取 / 新增 / 更新 / 跳过条数与跳过行号，可导出失败明细 CSV 核对；没有现成表点「下载模板」按三列示例填；旧的两列「编码 + 名称」文件也能导，名称会同时当行政组织名称与核算组织名称；</li>
           <li>人员映射：工号或姓名 → 部门，保存后立刻对结果生效，优先级高于人员类型。新增、编辑时部门选择旁有搜索框，输部门名称或核算组织编码就能筛，只剩一个结果会自动选上；表格上方搜索框按工号 / 姓名 / 部门筛；批量做点「批量导入映射」（工号、姓名、部门编码三列，可点「下载模板」），要重来点「清空数据」；</li>
           <li>字段识别：账单和花名册各选一次工作表和表头行，再把六个字段的下拉对上——运费金额、付款方式、寄件人姓名、运单号（账单侧），员工工号、员工姓名、行政组织名称、运单号（花名册侧）。导入后会自动按常见列名预选：账单认「应付金额 / 付款方式 / 寄件人 / 运单号码」，花名册认「工号 / 寄件人姓名 / 部门 / 运单编号」（表头写「费用归属部门名称」「行政组织名称」也能认）；表头换了名字就在这里手动指，改完点「按当前设置重新解析」；</li>
-          <li>人员类型：规则表默认是空的，第一次用要按贵司工号规则自己加（例如「前缀 W → W外包，需人工确认」和「工号长度 8 → 内部员工」）。一张从上到下依次判断的规则表，第一条命中即生效，所以前缀规则要排在长度规则前面。新增：选匹配方式（前缀匹配 / 工号匹配（完全相同）/ 工号长度）→ 填值 → 填类型名称（这个名字会直接显示成未匹配原因）→ 选是否外包 / 供应商，点「添加规则」。已有规则可「上移」「下移」调顺序，不要的点「删除」；点「载入示例规则」可以一次性得到 W / V / F 前缀 + 8 位工号这套常用设置再按需改。规则为空或某个工号哪条都没命中时，该单据一律进未匹配并标「未知工号段」；勾了外包 / 供应商的类型一律需人工确认部门；</li>
+          <li>人员类型：规则表默认是空的，第一次用要按贵司工号规则自己加（例如「前缀 W → W外包，需人工确认」和「工号长度 8 → 内部员工」）。一张从上到下依次判断的规则表，第一条命中即生效，所以前缀规则要排在长度规则前面。新增：选匹配方式（前缀匹配 / 工号匹配（完全相同）/ 工号长度）→ 填值 → 填类型名称（这个名字会直接显示成未匹配原因）→ 选是否外包 / 供应商，点「添加规则」。规则按添加先后从上到下排列，新加的排在末尾，要改某条点「编辑」（表单会回填，改完点「保存修改」），不要的点「删除」。规则为空或某个工号哪条都没命中时，该单据一律进未匹配并标「未知工号段」；勾了外包 / 供应商的类型一律需人工确认部门；</li>
           <li>配置备份：点「一键导出备份」存成一个 json，部门映射、人员映射、人员类型规则和表结构（账单 / 花名册的工作表与表头行）整套打包；换电脑、或浏览器清理记录后，点「一键导入备份」选这个文件，再选「合并导入」（保留现有配置，同编码同类目用备份里的更新）或「覆盖导入」（清空后整体恢复）即可。备份建议放桌面或网盘，清理浏览器记录前先导出一份。注意列级字段识别不在这份备份里，换表头名字仍要在「字段识别」里重设。</li>
         </ul>
       </div>
@@ -2653,6 +2946,43 @@ function mtCloudPush(key){
     <div class="sub-header-line">
       <div class="yellow-mark"></div>
       <span>小优化·大不同</span>
+    </div>
+
+    <div class="log-item">
+      <div class="log-date"><b>11/23</b>2026</div>
+      <div class="log-rail" aria-hidden="true"></div>
+      <div class="log-body">
+        <h3>顶部导航增强<span class="log-tag">视觉优化</span></h3>
+        <ul>
+          <li>导航阴影：页面滚动超过 8px 时顶部导航浮现柔和阴影，回到顶部自动消失，过渡 0.25s；浅色白底，不引入暗黑模式。</li>
+          <li>激活态改造：取消每个菜单项各自的下划线，改为所有菜单共用一条下划线，切换时平滑滑动到对应链接下方，线条粗细与位置与原来一致。</li>
+          <li>Bug修复：修复切换「工具集」后导航与 LOGO 整体横向偏移——页面高度跨过视口阈值时滚动条出现/消失，可视宽度突变带动居中布局横移；改为始终预留滚动条槽位，宽度恒定不再跳。</li>
+          <li>功能优化：人员类型配置弹窗移除上移、下移按钮与排序逻辑，仅保留添加、删除规则功能。</li>
+        </ul>
+        <h3>配置界面优化<span class="log-tag">界面优化</span></h3>
+        <ul>
+          <li>全局配置区布局调整：「新增板块」按钮移到「导出配置 / 导入配置」右侧，用黑底主按钮样式与两个次要按钮区分，配置类操作集中在一排。</li>
+          <li>板块卡片精简：卡片不再显示关键词、优先级、重点项、楼层映射、负责人等详情，只保留板块名称与板块操作入口；所有字段仍在编辑弹窗内维护，逻辑不变。</li>
+          <li>新增板块改为独立弹窗：点「新增板块」唤起与编辑板块同样式的表单弹窗，板块列表区不再插一张竖版表单，排布更整齐。</li>
+          <li>新增板块表单排版优化：标签在上、输入框在下，行距拉开；优先级输入框单独收窄，辅助说明改为标签后的浅灰小字，底部按钮靠右对齐。</li>
+          <li>部门映射表格、人员映射表格容器限定可视行数：固定展示 6 条，超出部分在容器内滚动，避免配置页越拉越长。</li>
+        </ul>
+        <h3>巡查记录能力升级<span class="log-tag">功能优化</span></h3>
+        <ul>
+          <li>搜索支持日期检索：除关键词、负责人外，可输入 2026-11-18、11-18、2026-11 等写法按巡查日期筛选，也支持「关键词 + 日期」组合搜索；识别不出日期时退回原文本搜索。</li>
+          <li>搜索框占位文字改为「搜索关键词、负责人、日期」，给日期检索入口提示。</li>
+          <li>巡查记录列表增加分页，默认每页 10 条，带总条数、当前区间与上一页/下一页，搜索或筛选后自动回到第 1 页，解决记录增多后页面无限拉长、加载卡顿的问题。</li>
+          <li>列表倒序展示：日期最新的记录排在最上面，同一天里后登记的排在同日最前，登记完一眼就能看到今天新增了哪些问题；序号随展示顺序从 1 递增。</li>
+          <li>导出保持正序：导出 Excel 与「追加导出」仍按时间由早到晚排列（11/1 在第一行、11/2 第二行……），同一天按登记先后，方便归档汇总；页面展示与导出互不影响。</li>
+          <li>搜索、分页、编辑、删除逻辑不变，筛选后同样按倒序展示。</li>
+        </ul>
+        <h3>板块配置面板内编辑<span class="log-tag">交互优化</span></h3>
+        <ul>
+          <li>板块配置改为面板内编辑：点击板块名称，卡片按 transitions.dev Accordion 原位展开，编辑表单直接在面板里展开，不再另开弹窗，字段与原来一致（名称、关键词、优先级、负责人、重点项、楼层映射）。</li>
+          <li>交互调整：移除「编辑板块」按钮与展开箭头，卡片只保留板块名称与右侧常驻的「删除板块」；一次只展开一个板块，其余自动收起；点「删除板块」不触发展开。</li>
+          <li>面板底部「保存板块」就地保存并刷新标题，旁边有一闪的「已保存」提示，「收起」可折叠面板；动画兼容系统「减少动态效果」偏好。</li>
+        </ul>
+      </div>
     </div>
 
     <div class="log-item">
@@ -2972,7 +3302,6 @@ const LAST_EXPORT_TIME_KEY = "inspect_last_export_time";
 let recordList = [];
 let editIdx = null;
 let previewTempList = [];
-let currentEditPlateIdx = null;
 let cfg = {
     plates: [
         {
@@ -3300,23 +3629,113 @@ function confirmPreviewAdd() {
     closePreviewMask();
     document.getElementById("inputText").value = "";
 }
+/* ===== v1.81 巡查记录：日期检索 + 分页 ===== */
+var PAGE_SIZE = 10;
+var pageIdx = 0;
+var lastFilteredCount = 0;
+
+/* 统一日期写法：年月日、斜杠、点、中文单位都归一成 2026-11-18 形式 */
+function normDateText(t) {
+    return String(t === undefined || t === null ? "" : t)
+        .replace(/[年]/g, "-")
+        .replace(/[月]/g, "-")
+        .replace(/[日号]/g, "")
+        .replace(/\./g, "-")
+        .replace(/\//g, "-");
+}
+
+/* 取文本里第一段日期（年可缺省），返回 {y,m,d} 或 null；时分秒不参与比较 */
+function firstDateParts(t) {
+    var str = normDateText(t);
+    var m4 = str.match(/(\d{4})\s*-\s*(\d{1,2})\s*(?:-\s*(\d{1,2}))?/);
+    if (m4) return { y: Number(m4[1]), m: Number(m4[2]), d: m4[3] ? Number(m4[3]) : null };
+    var m2 = str.match(/(\d{1,2})\s*-\s*(\d{1,2})/);
+    if (m2) return { y: null, m: Number(m2[1]), d: Number(m2[2]) };
+    return null;
+}
+
+/* 从搜索词里拆出日期片段（2026-11-18 / 11-18 / 2026-11 / 11.18 / 11月18日），剩下的是普通关键词 */
+function splitSearchQuery(raw) {
+    var dates = [];
+    var rest = String(raw || "").replace(/\d{2,4}\s*[年月.\/\-]\s*\d{1,2}\s*[月.\/\-]?\s*\d{0,2}\s*[日号]?/g, function (m) {
+        var parts = firstDateParts(m);
+        if (parts) dates.push(parts);
+        return " ";
+    });
+    return { dates: dates, rest: nzKey(rest).toLowerCase() };
+}
+
+/* 记录时间是否命中查询日期：只比年/月/日，忽略具体时分 */
+function matchDateQuery(recTime, q) {
+    if (!q) return false;
+    var r = firstDateParts(recTime);
+    if (!r) return false;
+    if (q.y !== null && q.y !== r.y) return false;
+    if (q.m !== r.m) return false;
+    if (q.d !== null && q.d !== r.d) return false;
+    return true;
+}
+
+function onLedgerSearch() {
+    pageIdx = 0;
+    renderTable();
+}
+
+function gotoPage(n) {
+    var totalPages = Math.max(1, Math.ceil(lastFilteredCount / PAGE_SIZE));
+    var target = Math.min(Math.max(0, n), totalPages - 1);
+    if (target === pageIdx) return;
+    pageIdx = target;
+    renderTable();
+}
+
+/* 记录时间转可比较的数值，用于排序；解析不出来时退回字符串比较 */
+function recordTimeNum(r) {
+    var t = String((r && r.time) || "");
+    var d = new Date(t.replace(/-/g, "/"));
+    return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
+/* 页面展示用：最新日期在最上面；同一天里后登记的排前面 */
+function recordListForView() {
+    return recordList.slice().reverse();
+}
+
+/* 导出用：由早到晚，同一天按登记先后（先登记的在前） */
+function recordListForExport() {
+    return recordList.slice().sort(function (a, b) { return recordTimeNum(a) - recordTimeNum(b); });
+}
+
 function renderTable() {
     const tbody = document.getElementById("tableBody");
     if (!tbody) return;
     tbody.innerHTML = "";
-    const sVal = nzKey(document.getElementById("searchVal").value || "").toLowerCase();
-    const list = recordList.filter(r => {
+    const rawQuery = document.getElementById("searchVal").value || "";
+    const q = splitSearchQuery(rawQuery);
+    const list = recordListForView().filter(r => {
+        if (q.dates.length) {
+            const okDate = q.dates.some(dp => matchDateQuery(r.time || "", dp));
+            if (!okDate) return false;
+        }
+        if (!q.rest) return true;
         return (
-            nzKey(r.desc || "").toLowerCase().includes(sVal) ||
-            nzKey(r.plate || "").toLowerCase().includes(sVal) ||
-            nzKey(r.owner || "").toLowerCase().includes(sVal)
+            nzKey(r.desc || "").toLowerCase().includes(q.rest) ||
+            nzKey(r.plate || "").toLowerCase().includes(q.rest) ||
+            nzKey(r.owner || "").toLowerCase().includes(q.rest) ||
+            nzKey(r.item || "").toLowerCase().includes(q.rest)
         );
     });
-    list.forEach((r) => {
+    lastFilteredCount = list.length;
+    const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+    if (pageIdx > totalPages - 1) pageIdx = totalPages - 1;
+    if (pageIdx < 0) pageIdx = 0;
+    const start = pageIdx * PAGE_SIZE;
+    const pageList = list.slice(start, start + PAGE_SIZE);
+    pageList.forEach((r, i) => {
         const realIdx = recordList.indexOf(r);
         const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${realIdx + 1}</td>
+            <td>${start + i + 1}</td>
             <td>${escapeHtml(r.time)}</td>
             <td>${escapeHtml(r.plate)}</td>
             <td>${escapeHtml(r.item)}</td>
@@ -3329,6 +3748,33 @@ function renderTable() {
         `;
         tbody.appendChild(tr);
     });
+    if (!pageList.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--min-gray);">' +
+            (recordList.length ? "没有匹配的记录，换个关键词或日期试试" : "暂无记录，粘贴问题后点「识别」添加") +
+            '</td></tr>';
+    }
+    renderPager(list.length, totalPages);
+}
+
+function renderPager(total, totalPages) {
+    const info = document.getElementById("pagerInfo");
+    const num = document.getElementById("pagerNum");
+    const prev = document.getElementById("pagerPrev");
+    const next = document.getElementById("pagerNext");
+    if (!info || !num || !prev || !next) return;
+    if (!total) {
+        info.innerText = "共 0 条";
+        num.innerText = "0 / 0";
+        prev.disabled = true;
+        next.disabled = true;
+        return;
+    }
+    const from = pageIdx * PAGE_SIZE + 1;
+    const to = Math.min(total, (pageIdx + 1) * PAGE_SIZE);
+    info.innerText = "共 " + total + " 条，当前 " + from + " - " + to;
+    num.innerText = (pageIdx + 1) + " / " + totalPages;
+    prev.disabled = pageIdx <= 0;
+    next.disabled = pageIdx >= totalPages - 1;
 }
 function escapeHtml(s) {
     if (s === null || s === undefined) return "";
@@ -3414,7 +3860,8 @@ function exportXlsx() {
     }
     try {
         const data = [["序号", "时间", "问题板块", "问题重点项", "问题描述", "负责人"]];
-        recordList.forEach((r, i) => {
+        /* 导出固定按时间由早到晚排列，同一天先登记的在前 */
+        recordListForExport().forEach((r, i) => {
             data.push([i + 1, r.time, r.plate, r.item, r.desc, r.owner]);
         });
         const ws = XLSX.utils.aoa_to_sheet(data);
@@ -3438,7 +3885,7 @@ document.getElementById("fileAppend").addEventListener("change", async function 
         const buf = await f.arrayBuffer();
         const wbOld = XLSX.read(buf);
         const sheet = wbOld.Sheets[wbOld.SheetNames[0]];
-        const rows = recordList.map((r, i) => [i + 1, r.time, r.plate, r.item, r.desc, r.owner]);
+        const rows = recordListForExport().map((r, i) => [i + 1, r.time, r.plate, r.item, r.desc, r.owner]);
         XLSX.utils.sheet_add_aoa(sheet, rows, { origin: -1 });
         const dateStr = new Date().toLocaleDateString().replace(/\//g, "-");
         XLSX.writeFile(wbOld, "台账_追加完成_" + dateStr + ".xlsx");
@@ -3536,30 +3983,207 @@ function doImportReplace() {
 function renderCfgPanel() {
     let plateHtml = "";
     cfg.plates.forEach((p, pidx) => {
-        const innerItemHtml = p.items.map(it => `<span class="tag">${it.name}</span>`).join("  ");
-        const floorMapHtml = p.floorOwnerMap && p.floorOwnerMap.length
-            ? p.floorOwnerMap.map(fm => `<span class="tag">${fm.floorKw.join(",")} → ${fm.owner}</span>`).join("  ")
-            : `<span style="font-weight:700;">无</span>`;
         plateHtml += `
-            <div class="cfg-block">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <div style="font-weight:700;letter-spacing:2px;">${escapeHtml(p.name)}</div>
-                    <div style="display:flex;gap:8px;">
-                        <button class="btn-mini" onclick="openEditPlate(${pidx})">编辑板块</button>
-                        <button class="btn-mini danger" onclick="delPlate(${pidx})">删除板块</button>
+            <div class="cfg-acc-item" data-pidx="${pidx}" aria-expanded="false">
+                <div class="cfg-acc-head" onclick="togglePlatePanel(this)">
+                    <span class="cfg-acc-title">${escapeHtml(p.name)}</span>
+                    <button class="btn-mini danger" onclick="event.stopPropagation();delPlate(${pidx})">删除板块</button>
+                </div>
+                <div class="cfg-acc-panel">
+                    <div class="cfg-acc-panel-inner">
+                        <div class="cfg-acc-body" id="plBody_${pidx}"></div>
                     </div>
                 </div>
-                <div class="row-line"></div>
-                <div style="font-size:13px;">关键词：${p.kw.join(",")}</div>
-                <div style="font-size:13px;">优先级：${p.priority}</div>
-                <div style="font-size:13px;margin-top:6px;">重点项：${innerItemHtml || "无"}</div>
-                <div style="font-size:13px;margin-top:6px;">楼层映射：${floorMapHtml}</div>
-                <div style="font-size:13px;">负责人列表：${p.owners.join(",")}</div>
-                <div style="font-size:13px;">默认负责人：${p.defOwner}</div>
             </div>
         `;
     });
+    if (!plateHtml) {
+        plateHtml = `<div class="row-line" style="padding:14px 0;color:var(--min-gray);font-size:13px;">还没有板块，点上方「新增板块」添加</div>`;
+    } else {
+        plateHtml = `<div class="cfg-accordion">${plateHtml}</div>`;
+    }
     document.getElementById("plateListWrap").innerHTML = plateHtml;
+}
+
+/* 点击板块名称：原位展开并在面板内直接编辑，同一时间只展开一个 */
+function togglePlatePanel(headEl) {
+    const item = headEl.parentNode;
+    const isOpen = item.getAttribute("aria-expanded") === "true";
+    document.querySelectorAll("#plateListWrap .cfg-acc-item").forEach(el => {
+        el.setAttribute("aria-expanded", "false");
+    });
+    if (isOpen) return;
+    const pidx = Number(item.getAttribute("data-pidx"));
+    if (isNaN(pidx) || !cfg.plates[pidx]) return;
+    item.setAttribute("aria-expanded", "true");
+    const body = document.getElementById("plBody_" + pidx);
+    if (body && !body.innerHTML.trim()) renderPlateInline(pidx);
+}
+
+function collapsePlatePanel(pidx) {
+    const item = document.querySelector('#plateListWrap .cfg-acc-item[data-pidx="' + pidx + '"]');
+    if (item) item.setAttribute("aria-expanded", "false");
+}
+
+/* 面板内表单：直接用当前板块数据渲染 */
+function plateFieldId(pidx, key) { return "pl" + pidx + "_" + key; }
+function plateFieldVal(pidx, key) {
+    const el = document.getElementById(plateFieldId(pidx, key));
+    return el ? el.value : "";
+}
+
+function renderPlateInline(pidx) {
+    const p = cfg.plates[pidx];
+    const body = document.getElementById("plBody_" + pidx);
+    if (!p || !body) return;
+    const id = key => plateFieldId(pidx, key);
+    let itemsHtml = p.items.map((it, i) => `
+        <div class="pl-line">
+            <input type="text" class="pl-w-item" id="${id('itName_' + i)}" value="${escapeHtml(it.name)}" placeholder="重点项名称">
+            <input type="text" class="pl-grow" id="${id('itKw_' + i)}" value="${escapeHtml(it.kw.join(","))}" placeholder="关键词，逗号分隔">
+            <button class="info btn-mini" onclick="plateInlineDelItem(${pidx},${i})">删除</button>
+        </div>`).join("");
+    let floorsHtml = p.floorOwnerMap.map((fm, i) => `
+        <div class="pl-line">
+            <input type="text" class="pl-w-item" id="${id('fmKw_' + i)}" value="${escapeHtml(fm.floorKw.join(","))}" placeholder="楼层关键字">
+            <input type="text" class="pl-w-owner" id="${id('fmOwner_' + i)}" value="${escapeHtml(fm.owner)}" placeholder="对应负责人">
+            <button class="info btn-mini" onclick="plateInlineDelFloor(${pidx},${i})">删除</button>
+        </div>`).join("");
+    body.innerHTML = `
+        <div class="pl-inline">
+            <div class="pl-row-flex">
+                <div class="pl-cell pl-w-name">
+                    <label>板块名称</label>
+                    <input type="text" id="${id('name')}" value="${escapeHtml(p.name)}">
+                </div>
+                <div class="pl-cell pl-w-pri">
+                    <label>优先级</label>
+                    <input type="text" id="${id('pri')}" value="${p.priority}">
+                </div>
+                <div class="pl-cell pl-w-owner">
+                    <label>默认负责人</label>
+                    <input type="text" id="${id('defOwner')}" value="${escapeHtml(p.defOwner)}">
+                </div>
+            </div>
+            <div class="pl-row">
+                <label>板块关键词 <span class="pl-hint">逗号分隔</span></label>
+                <input type="text" id="${id('kw')}" value="${escapeHtml(p.kw.join(","))}">
+            </div>
+            <div class="pl-row">
+                <label>负责人列表 <span class="pl-hint">逗号分隔</span></label>
+                <input type="text" id="${id('owners')}" value="${escapeHtml(p.owners.join(","))}">
+            </div>
+            <div class="pl-sub">
+                <div class="pl-sub-title">板块下属重点项</div>
+                <div id="${id('itemWrap')}">${itemsHtml || '<div class="pl-empty">暂无重点项，可在下方添加</div>'}</div>
+                <div class="pl-line">
+                    <input type="text" class="pl-w-item" id="${id('newItemName')}" placeholder="重点项名称">
+                    <input type="text" class="pl-grow" id="${id('newItemKw')}" placeholder="关键词，逗号分隔">
+                    <button class="primary btn-mini" onclick="plateInlineAddItem(${pidx})">添加重点项</button>
+                </div>
+            </div>
+            <div class="pl-sub">
+                <div class="pl-sub-title">楼层负责人映射</div>
+                <div id="${id('floorWrap')}">${floorsHtml || '<div class="pl-empty">暂无楼层映射，可在下方添加</div>'}</div>
+                <div class="pl-line">
+                    <input type="text" class="pl-w-item" id="${id('newFloorKw')}" placeholder="楼层关键字">
+                    <input type="text" class="pl-w-owner" id="${id('newFloorOwner')}" placeholder="对应负责人">
+                    <button class="primary btn-mini" onclick="plateInlineAddFloor(${pidx})">添加楼层映射</button>
+                </div>
+            </div>
+            <div class="pl-actions">
+                <span class="pl-saved" id="${id('saved')}">已保存</span>
+                <button class="primary btn-mini" onclick="plateInlineSave(${pidx})">保存板块</button>
+                <button class="info btn-mini" onclick="collapsePlatePanel(${pidx})">收起</button>
+            </div>
+        </div>`;
+}
+
+/* 把面板里当前填的内容写回内存（保存、增删重点项前都先调一次，避免丢改动） */
+function plateInlineRead(pidx) {
+    const p = cfg.plates[pidx];
+    if (!p || !document.getElementById(plateFieldId(pidx, "name"))) return;
+    p.name = plateFieldVal(pidx, "name").trim();
+    p.kw = plateFieldVal(pidx, "kw").split(",").map(x => x.trim()).filter(x => x);
+    p.priority = Number(plateFieldVal(pidx, "pri")) || 0;
+    p.owners = plateFieldVal(pidx, "owners").split(",").map(x => x.trim()).filter(x => x);
+    p.defOwner = plateFieldVal(pidx, "defOwner").trim();
+    p.items.forEach((it, i) => {
+        it.name = plateFieldVal(pidx, "itName_" + i).trim();
+        it.kw = plateFieldVal(pidx, "itKw_" + i).split(",").map(x => x.trim()).filter(x => x);
+    });
+    p.floorOwnerMap.forEach((fm, i) => {
+        fm.floorKw = plateFieldVal(pidx, "fmKw_" + i).split(",").map(x => x.trim()).filter(x => x);
+        fm.owner = plateFieldVal(pidx, "fmOwner_" + i).trim();
+    });
+}
+
+function plateInlineAddItem(pidx) {
+    plateInlineRead(pidx);
+    const iname = plateFieldVal(pidx, "newItemName").trim();
+    const ikwStr = plateFieldVal(pidx, "newItemKw").trim();
+    if (!iname) { alert("填写重点项名称"); return; }
+    cfg.plates[pidx].items.push({ name: iname, kw: ikwStr.split(",").map(x => x.trim()).filter(x => x) });
+    renderPlateInline(pidx);
+    const el = document.getElementById(plateFieldId(pidx, "newItemName"));
+    if (el) el.focus({ preventScroll: true });
+}
+
+function plateInlineDelItem(pidx, iIdx) {
+    if (!confirm("删除该板块内重点项？")) return;
+    plateInlineRead(pidx);
+    cfg.plates[pidx].items.splice(iIdx, 1);
+    renderPlateInline(pidx);
+}
+
+function plateInlineAddFloor(pidx) {
+    plateInlineRead(pidx);
+    const fKwStr = plateFieldVal(pidx, "newFloorKw").trim();
+    const fOwner = plateFieldVal(pidx, "newFloorOwner").trim();
+    if (!fKwStr || !fOwner) { alert("填写楼层关键字和负责人"); return; }
+    cfg.plates[pidx].floorOwnerMap.push({ floorKw: fKwStr.split(",").map(x => x.trim()).filter(x => x), owner: fOwner });
+    renderPlateInline(pidx);
+}
+
+function plateInlineDelFloor(pidx, iIdx) {
+    if (!confirm("删除这条楼层负责人映射？")) return;
+    plateInlineRead(pidx);
+    cfg.plates[pidx].floorOwnerMap.splice(iIdx, 1);
+    renderPlateInline(pidx);
+}
+
+function plateInlineSave(pidx) {
+    plateInlineRead(pidx);
+    saveCfgLocal();
+    /* 就地刷新列表标题，再重新展开当前板块，保持编辑态 */
+    renderCfgPanel();
+    const item = document.querySelector('#plateListWrap .cfg-acc-item[data-pidx="' + pidx + '"]');
+    if (item) {
+        item.setAttribute("aria-expanded", "true");
+        renderPlateInline(pidx);
+        const saved = document.getElementById(plateFieldId(pidx, "saved"));
+        if (saved) {
+            saved.classList.add("show");
+            setTimeout(() => {
+                const s2 = document.getElementById(plateFieldId(pidx, "saved"));
+                if (s2) s2.classList.remove("show");
+            }, 1600);
+        }
+    }
+}
+
+function openNewPlateMask() {
+    document.getElementById("newPlateName").value = "";
+    document.getElementById("newPlateKw").value = "";
+    document.getElementById("newPlatePri").value = 10;
+    document.getElementById("newPlateOwners").value = "";
+    document.getElementById("newPlateDefOwner").value = "";
+    openModal('newPlateMask');
+    const nameEl = document.getElementById("newPlateName");
+    setTimeout(() => { try { nameEl.focus({ preventScroll: true }); } catch (e) {} }, 180);
+}
+function closeNewPlateMask() {
+    closeModal('newPlateMask');
 }
 function addPlate() {
     const name = document.getElementById("newPlateName").value.trim();
@@ -3584,121 +4208,12 @@ function addPlate() {
     });
     saveCfgLocal();
     renderCfgPanel();
+    closeNewPlateMask();
     document.getElementById("newPlateName").value = "";
     document.getElementById("newPlateKw").value = "";
     document.getElementById("newPlatePri").value = 10;
     document.getElementById("newPlateOwners").value = "";
     document.getElementById("newPlateDefOwner").value = "";
-}
-function openEditPlate(pidx) {
-    currentEditPlateIdx = pidx;
-    const p = cfg.plates[pidx];
-    document.getElementById("epName").value = p.name;
-    document.getElementById("epKw").value = p.kw.join(",");
-    document.getElementById("epPri").value = p.priority;
-    document.getElementById("epOwners").value = p.owners.join(",");
-    document.getElementById("epDefOwner").value = p.defOwner;
-    renderEditPlateItemList();
-    renderEditPlateFloorList();
-    openModal('editPlateMask');
-}
-function closeEditPlateMask() {
-    closeModal('editPlateMask');
-    currentEditPlateIdx = null;
-}
-function renderEditPlateItemList() {
-    const p = cfg.plates[currentEditPlateIdx];
-    let html = "";
-    p.items.forEach((it, i) => {
-        html += `
-            <div class="sub-item">
-                <input type="text" id="itName_${i}" value="${escapeHtml(it.name)}" placeholder="重点项名称" style="flex:1;">
-                <input type="text" id="itKw_${i}" value="${escapeHtml(it.kw.join(","))}" placeholder="关键词逗号分隔" style="flex:2;">
-                <button class="btn-mini danger" onclick="delPlateInnerItem(${i})">删</button>
-            </div>
-        `;
-    });
-    document.getElementById("epItemWrap").innerHTML = html;
-}
-function addPlateInnerItem() {
-    const p = cfg.plates[currentEditPlateIdx];
-    const iname = document.getElementById("epNewItemName").value.trim();
-    const ikwStr = document.getElementById("epNewItemKw").value.trim();
-    if (!iname) {
-        alert("填写重点项名称");
-        return;
-    }
-    const ikw = ikwStr.split(",").map(x => x.trim()).filter(x => x);
-    p.items.push({ name: iname, kw: ikw });
-    renderEditPlateItemList();
-    document.getElementById("epNewItemName").value = "";
-    document.getElementById("epNewItemKw").value = "";
-}
-function delPlateInnerItem(iIdx) {
-    const p = cfg.plates[currentEditPlateIdx];
-    if (!confirm("删除该板块内重点项？")) return;
-    p.items.splice(iIdx, 1);
-    renderEditPlateItemList();
-}
-function renderEditPlateFloorList() {
-    const p = cfg.plates[currentEditPlateIdx];
-    let html = "";
-    p.floorOwnerMap.forEach((fm, i) => {
-        html += `
-            <div class="sub-item">
-                <input type="text" id="fmKw_${i}" value="${escapeHtml(fm.floorKw.join(","))}" placeholder="楼层关键字逗号分隔" style="flex:1;">
-                <input type="text" id="fmOwner_${i}" value="${escapeHtml(fm.owner)}" placeholder="负责人" style="flex:1;">
-                <button class="btn-mini danger" onclick="delPlateFloorMap(${i})">删</button>
-            </div>
-        `;
-    });
-    document.getElementById("epFloorOwnerWrap").innerHTML = html;
-}
-function addPlateFloorMap() {
-    const p = cfg.plates[currentEditPlateIdx];
-    const fKwStr = document.getElementById("epNewFloorKw").value.trim();
-    const fOwner = document.getElementById("epNewFloorOwner").value.trim();
-    if (!fKwStr || !fOwner) {
-        alert("填写楼层关键字和负责人");
-        return;
-    }
-    const fKw = fKwStr.split(",").map(x => x.trim()).filter(x => x);
-    p.floorOwnerMap.push({ floorKw: fKw, owner: fOwner });
-    renderEditPlateFloorList();
-    document.getElementById("epNewFloorKw").value = "";
-    document.getElementById("epNewFloorOwner").value = "";
-}
-function delPlateFloorMap(iIdx) {
-    const p = cfg.plates[currentEditPlateIdx];
-    if (!confirm("删除这条楼层负责人映射？")) return;
-    p.floorOwnerMap.splice(iIdx, 1);
-    renderEditPlateFloorList();
-}
-function saveEditPlate() {
-    const p = cfg.plates[currentEditPlateIdx];
-    p.name = document.getElementById("epName").value.trim();
-    p.kw = document.getElementById("epKw").value.split(",").map(x => x.trim()).filter(x => x);
-    p.priority = Number(document.getElementById("epPri").value);
-    p.owners = document.getElementById("epOwners").value.split(",").map(x => x.trim()).filter(x => x);
-    p.defOwner = document.getElementById("epDefOwner").value.trim();
-    const pItem = cfg.plates[currentEditPlateIdx].items;
-    for (let i = 0; i < pItem.length; i++) {
-        const nVal = document.getElementById("itName_" + i).value.trim();
-        const kwVal = document.getElementById("itKw_" + i).value.trim();
-        pItem[i].name = nVal;
-        pItem[i].kw = kwVal.split(",").map(x => x.trim()).filter(x => x);
-    }
-    const pFloor = cfg.plates[currentEditPlateIdx].floorOwnerMap;
-    for (let i = 0; i < pFloor.length; i++) {
-        const kwVal = document.getElementById("fmKw_" + i).value.trim();
-        const ownVal = document.getElementById("fmOwner_" + i).value.trim();
-        pFloor[i].floorKw = kwVal.split(",").map(x => x.trim()).filter(x => x);
-        pFloor[i].owner = ownVal;
-    }
-    saveCfgLocal();
-    renderCfgPanel();
-    closeEditPlateMask();
-    alert("板块保存成功");
 }
 function delPlate(idx) {
     if (!confirm("删除板块？")) return;
@@ -3780,16 +4295,6 @@ function esc(s) {
 /* ---------- 部门 ---------- */
 function defaultDepts() {
   return [];
-}
-/* 演示数据自带的示例部门，只有点「载入演示数据」才写入 */
-function demoDepts() {
-  return [
-    { code: "0101", admin: "行政部", acct: "行政部" },
-    { code: "0102", admin: "财务部", acct: "财务部" },
-    { code: "0201", admin: "技术部", acct: "技术部" },
-    { code: "0301", admin: "市场部", acct: "市场部" },
-    { code: "0302", admin: "运营部", acct: "运营部" }
-  ];
 }
 /* 一条部门记录三个字段：code 核算组织编码、admin 行政组织名称（花名册匹配键）、acct 核算组织名称（汇总输出） */
 function normDeptItem(it) {
@@ -3895,11 +4400,44 @@ var deptKw = "";
 var mapKw = "";
 function onDeptSearch(v) { deptKw = String(v || "").trim(); renderDept(); }
 function onMapSearch(v) { mapKw = String(v || "").trim(); renderManual(); }
+
+/* ===== v1.81：设置内三张表固定只露 6 行，其余在容器内滚动 ===== */
+function clampRows6(sel) {
+  var wrap = q(sel);
+  if (!wrap) return;
+  var tb = wrap.querySelector("tbody");
+  if (!tb) return;
+  var rows = tb.rows || [];
+  if (rows.length <= 6) {
+    wrap.style.maxHeight = "";
+    wrap.classList.remove("has-more");
+    return;
+  }
+  var headRow = wrap.querySelector("thead tr");
+  var headH = headRow ? headRow.getBoundingClientRect().height : 0;
+  if (!headH) return; /* 页签未显示时量不到高度，等切过来再算 */
+  var h = 0;
+  for (var i = 0; i < 6 && i < rows.length; i++) {
+    h += rows[i].getBoundingClientRect().height;
+  }
+  wrap.style.maxHeight = Math.ceil(headH + h + 2) + "px";
+  wrap.classList.add("has-more");
+}
+function clampAllRows6() {
+  clampRows6("#deptScroll");
+  clampRows6("#manualScroll");
+}
+var clampRows6Timer = null;
+window.addEventListener("resize", function () {
+  if (clampRows6Timer) clearTimeout(clampRows6Timer);
+  clampRows6Timer = setTimeout(clampAllRows6, 120);
+});
+
 function renderDept() {
   var list = loadDept();
   var tb = q("#deptTbody");
   tb.innerHTML = "";
-  if (!list.length) { tb.innerHTML = '<tr><td colspan="4" class="muted">暂无部门，请先新增</td></tr>'; return; }
+  if (!list.length) { tb.innerHTML = '<tr><td colspan="4" class="muted">暂无部门，请先新增</td></tr>'; clampRows6("#deptScroll"); return; }
   var showed = 0;
   list.forEach(function (d, i) {
     if (deptKw) {
@@ -3917,6 +4455,7 @@ function renderDept() {
   if (!showed) tb.innerHTML = '<tr><td colspan="4" class="muted">没有匹配的部门，换个关键词试试</td></tr>';
   var tip = q("#deptSearchTip");
   if (tip) tip.textContent = deptKw ? ("共 " + list.length + " 条，筛出 " + showed + " 条") : ("共 " + list.length + " 条");
+  clampRows6("#deptScroll");
 }
 function editDept(i) {
   var list = loadDept(); var d = list[i]; if (!d) return;
@@ -4004,6 +4543,7 @@ function setTab(name) {
   q("#setPaneBackup").classList.toggle("hide", name !== "backup");
   if (name === "backup") renderBackupStat();
   syncFieldTip();
+  requestAnimationFrame(function () { clampAllRows6(); });
 }
 
 function renderRules() {
@@ -4011,7 +4551,7 @@ function renderRules() {
   var tb = q("#rulesTbody");
   tb.innerHTML = "";
   if (!rules.length) {
-    tb.innerHTML = '<tr><td colspan="5" class="muted">还没有人员类型规则，此时所有工号都会进未匹配清单，请按贵司工号规则在下面手动添加；也可以点「载入示例规则」直接得到 W / V / F 前缀 + 8 位工号这套常用设置，再按需改。</td></tr>';
+    tb.innerHTML = '<tr><td colspan="5" class="muted">还没有人员类型规则，此时所有工号都会进未匹配清单，请按贵司工号规则在下面手动添加。</td></tr>';
     return;
   }
   rules.forEach(function (r, i) {
@@ -4021,12 +4561,38 @@ function renderRules() {
       "<td>" + esc(r.value) + "</td>" +
       "<td>" + esc(r.label) + "</td>" +
       "<td>" + (r.outer ? "外包/供应商（需人工确认）" : "内部员工（走花名册）") + "</td>" +
-      '<td><button class="btn-mini info" onclick="moveRule(' + i + ',-1)">上移</button> ' +
-      '<button class="btn-mini info" onclick="moveRule(' + i + ',1)">下移</button> ' +
+      '<td><button class="btn-mini" onclick="EXPRESS.editRule(' + i + ')">编辑</button> ' +
       '<button class="btn-mini danger" onclick="EXPRESS.delRule(' + i + ')">删除</button></td>';
     tb.appendChild(tr);
   });
 }
+/* 正在编辑的规则下标，-1 表示新增 */
+var editingRule = -1;
+
+function resetRuleForm() {
+  editingRule = -1;
+  q("#inpRuleValue").value = "";
+  q("#inpRuleLabel").value = "";
+  var addBtn = q("#btnAddRule");
+  if (addBtn) addBtn.textContent = "添加规则";
+}
+
+function editRule(i) {
+  var rules = loadRules();
+  var r = rules[i];
+  if (!r) return;
+  editingRule = i;
+  q("#selRuleMode").value = r.mode;
+  q("#inpRuleValue").value = r.value;
+  q("#inpRuleLabel").value = r.label;
+  q("#selRuleOuter").value = r.outer ? "1" : "0";
+  var addBtn = q("#btnAddRule");
+  if (addBtn) addBtn.textContent = "保存修改";
+  var panel = q("#selRuleMode");
+  if (panel && panel.scrollIntoView) { try { panel.scrollIntoView({ block: "center", behavior: "smooth" }); } catch (e) { panel.scrollIntoView(); } }
+  toast("正在编辑：第 " + (i + 1) + " 条规则，改完点「保存修改」");
+}
+
 function addRule() {
   var mode = q("#selRuleMode").value;
   var val = q("#inpRuleValue").value.trim();
@@ -4038,13 +4604,26 @@ function addRule() {
   var rules = loadRules();
   var dupIdx = -1;
   rules.forEach(function (r, idx) {
+    if (idx === editingRule) return;  /* 编辑中这条不算重复 */
     if (r.mode === mode && r.value.toUpperCase() === val.toUpperCase()) dupIdx = idx;
   });
   if (dupIdx > -1) {
     if (!confirm("已存在相同规则（" + rules[dupIdx].value + "），要覆盖吗？")) return;
     rules.splice(dupIdx, 1);
+    if (dupIdx < editingRule) editingRule--;
   }
-  rules.unshift({ mode: mode, value: val, label: label, outer: outer });
+  var target = editingRule;
+  if (target > -1) {
+    /* 保存修改：原位替换，不影响规则前后顺序 */
+    rules[target] = { mode: mode, value: val, label: label, outer: outer };
+    saveRules(rules);
+    resetRuleForm();
+    renderRules();
+    toast("已保存修改：" + val + " -> " + label);
+    return;
+  }
+  /* 新增规则追加到末尾：顺序即匹配顺序，从上到下第一条命中即生效 */
+  rules.push({ mode: mode, value: val, label: label, outer: outer });
   saveRules(rules);
   q("#inpRuleValue").value = "";
   q("#inpRuleLabel").value = "";
@@ -4056,14 +4635,8 @@ function delRule(i) {
   if (!confirm("删除规则「" + rules[i].value + " -> " + rules[i].label + "」？")) return;
   rules.splice(i, 1);
   saveRules(rules);
-  renderRules();
-}
-function moveRule(i, dir) {
-  var rules = loadRules();
-  var j = i + dir;
-  if (j < 0 || j >= rules.length) return;
-  var tmp = rules[i]; rules[i] = rules[j]; rules[j] = tmp;
-  saveRules(rules);
+  if (editingRule === i) resetRuleForm();
+  else if (editingRule > i) editingRule--;
   renderRules();
 }
 /* 只做一次：把旧版本内置的四个默认规则从已保存配置里剔掉，用户自己加的规则保留 */
@@ -4084,14 +4657,6 @@ function migrateRuleDefaults() {
     }
   } catch (e) {}
   localStorage.setItem(ST_RULES_LEGACY, "1");
-}
-
-function resetRules() {
-  var demo = LEGACY_DEFAULT_RULES.map(function (r) { return Object.assign({}, r); });
-  if (loadRules().length && !confirm("载入示例规则会替换当前全部人员类型规则，确定继续？")) return;
-  saveRules(demo);
-  renderRules();
-  toast("已载入示例规则：W / V / F 前缀 + 8 位工号");
 }
 
 function renderBackupStat() {
@@ -4533,7 +5098,7 @@ function renderManual() {
   dedupeManualMap();
   var m = loadMap(); var tb = q("#manualTbody"); tb.innerHTML = "";
   var keys = Object.keys(m);
-  if (!keys.length) { tb.innerHTML = '<tr><td colspan="7" class="muted">暂无人员映射记录，处理未匹配清单后会自动记录</td></tr>'; return; }
+  if (!keys.length) { tb.innerHTML = '<tr><td colspan="7" class="muted">暂无人员映射记录，处理未匹配清单后会自动记录</td></tr>'; clampRows6("#manualScroll"); return; }
   var showed = 0;
   keys.forEach(function (no) {
     var it = m[no];
@@ -4554,6 +5119,7 @@ function renderManual() {
   if (!showed) tb.innerHTML = '<tr><td colspan="7" class="muted">没有匹配的记录，换个关键词试试</td></tr>';
   var tip = q("#mapSearchTip");
   if (tip) tip.textContent = mapKw ? ("共 " + keys.length + " 条，筛出 " + showed + " 条") : ("共 " + keys.length + " 条");
+  clampRows6("#manualScroll");
 }
 function delManual(no) {
   var m = loadMap(); delete m[no]; saveMap(m); renderManual(); toast("已删除 " + no + " 的映射");
@@ -5879,76 +6445,6 @@ function exportPlain() {
   toast("已导出 Excel");
 }
 
-/* ---------- 演示 ---------- */
-function loadDemo() {
-  /* 演示数据依赖 W / V / F 前缀与 8 位工号规则：缺哪条补哪条，不动用户已有规则 */
-  (function () {
-    var cur = loadRules(), added = 0;
-    LEGACY_DEFAULT_RULES.forEach(function (d) {
-      var has = cur.some(function (r) { return r.mode === d.mode && String(r.value).toUpperCase() === String(d.value).toUpperCase(); });
-      if (!has) { cur.push(Object.assign({}, d)); added++; }
-    });
-    if (added) { saveRules(cur); renderRules(); toast("演示数据已补上示例人员类型规则（W / V / F 前缀 + 8 位工号）"); }
-  })();
-  /* 演示数据依赖示例部门：缺哪条补哪条，不动用户已有的映射 */
-  (function () {
-    var cur = loadDept(), dirty = false;
-    demoDepts().forEach(function (d) {
-      var has = cur.some(function (x) { return x.admin === d.admin || (d.code && x.code === d.code); });
-      if (!has) { cur.push(d); dirty = true; }
-    });
-    if (dirty) saveDept(cur);
-  })();
-
-  var demoBill = [
-    { "运单号": "SF202611090001", "寄件人": "张三", "工号": "80265601", "付款方式": "到付", "金额": 106 },
-    { "运单号": "SF202611090002", "寄件人": "张三", "工号": "80265601", "付款方式": "到付", "金额": 15 },
-    { "运单号": "SF202611090003", "寄件人": "李四", "工号": "80321987", "付款方式": "到付", "金额": 88 },
-    { "运单号": "SF202611090004", "寄件人": "孙八", "工号": "80551234", "付款方式": "到付", "金额": 45.2 },
-    { "运单号": "SF202611090005", "寄件人": "孙八", "工号": "80551234", "付款方式": "到付", "金额": 20 },
-    { "运单号": "SF202611090006", "寄件人": "周九", "工号": "80667788", "付款方式": "寄付月结", "金额": 31.8 },
-    { "运单号": "SF202611090007", "寄件人": "周九", "工号": "80667788", "付款方式": "寄付月结", "金额": 9.6 },
-    { "运单号": "SF202611090008", "寄件人": "吴十", "工号": "80779012", "付款方式": "寄付月结", "金额": 22.5 },
-    { "运单号": "SF202611090009", "寄件人": "王五", "工号": "W1108541", "付款方式": "寄付月结", "金额": 53 },
-    { "运单号": "SF202611090010", "寄件人": "王五", "工号": "W1108541", "付款方式": "寄付月结", "金额": 8 },
-    { "运单号": "SF202611090011", "寄件人": "郑十一", "工号": "W1108542", "付款方式": "寄付月结", "金额": 12 },
-    { "运单号": "SF202611090012", "寄件人": "郑十一", "工号": "W1108542", "付款方式": "寄付月结", "金额": 6.5 }
-  ];
-  var demoRoster = [
-    { "运单号": "SF202611090001", "工号": "80265601", "姓名": "张三", "行政组织名称": "行政部" },
-    { "运单号": "SF202611090003", "工号": "80321987", "姓名": "李四", "行政组织名称": "财务部" },
-    { "运单号": "SF202611090004", "工号": "80551234", "姓名": "孙八", "行政组织名称": "运营部" },
-    { "运单号": "SF202611090006", "工号": "80667788", "姓名": "周九", "行政组织名称": "技术部" },
-    { "运单号": "SF202611090008", "工号": "80779012", "姓名": "吴十", "行政组织名称": "市场部" },
-    { "运单号": "SF202611090009", "工号": "W1108541", "姓名": "王五", "行政组织名称": "财务部" },
-    { "运单号": "SF202611090011", "工号": "W1108542", "姓名": "郑十一", "行政组织名称": "技术部" },
-    { "运单号": "SF202611090012", "工号": "W1108543", "姓名": "冯十二", "行政组织名称": "运营部" }
-  ];
-
-  billRaw = demoBill; rosterRaw = demoRoster;
-  q("#billFileInfo").textContent = "演示数据，共 " + demoBill.length + " 行（不是真实账单）";
-  q("#rosterFileInfo").textContent = "演示数据，共 " + demoRoster.length + " 行（不是真实花名册）";
-
-  var hb = Object.keys(demoBill[0]);
-  fillSel("#selAmt", hb, ["金额", "费用", "运费"]);
-  fillSel("#selPay", hb, ["付款方式", "支付方式", "结算方式"]);
-  fillSel("#selName", hb, ["姓名", "寄件人", "发件人"]);
-  fillSel("#selBillWay", hb, ["运单号", "运单编号", "快递单号"]);
-  q("#selAmt").value = "4"; q("#selPay").value = "3"; q("#selName").value = "1"; q("#selBillWay").value = "0";
-  fieldState.bill = { no: -1, amt: 4, pay: 3, name: 1, way: 0, invalid: false, headers: hb };
-
-  var hr = Object.keys(demoRoster[0]);
-  fillSel("#selRostEmp", hr, ["工号", "员工号", "员工编号"]);
-  fillSel("#selRostName", hr, ["姓名"]);
-  fillSel("#selRostDept", hr, ["行政组织名称", "组织名称", "部门全称", "部门名称", "部门"]);
-  fillSel("#selRostWay", hr, ["运单号", "运单编号", "快递单号"]);
-  q("#selRostEmp").value = "1"; q("#selRostName").value = "2"; q("#selRostDept").value = "3"; q("#selRostWay").value = "0";
-  fieldState.roster = { no: 1, name: 2, dept: 3, way: 0, invalid: false, headers: hr };
-
-  doMatch();
-  toast("演示数据已载入，可切换 4 个标签查看，或用搜索框试搜 W");
-}
-
 window.onload = function () {
 
   migrateRuleDefaults();
@@ -6560,6 +7056,7 @@ window.EXPRESS = {
   delDept: delDept,
   delManual: delManual,
   delRule: delRule,
+  editRule: editRule,
   doMatch: doMatch,
   editDept: editDept,
   editManual: editManual,
@@ -6569,13 +7066,11 @@ window.EXPRESS = {
   exportExcel: exportExcel,
   ignoreUnmatch: ignoreUnmatch,
   importConfig: importConfig,
-  loadDemo: loadDemo,
   onSearch: onSearch,
   openSettings: openSettings,
   resetDeptInput: resetDeptInput,
   onDeptSearch: onDeptSearch,
   onMapSearch: onMapSearch,
-  resetRules: resetRules,
   saveDeptItem: saveDeptItem,
   saveEditManual: saveEditManual,
   setTab: setTab,
@@ -7116,6 +7611,70 @@ window.EXPRESS = {
   }
   if (document.readyState === "complete") check();
   else window.addEventListener("load", check);
+})();
+</script>
+<script>
+/* ===== v1.77 导航增强：滚动阴影 + 共用滑动下划线 =====
+   1. 不劫持任何点击，完全交给原生 a 标签与原有路由
+   2. 下划线用 offsetLeft/offsetWidth 取布局位置（不受入场 translate 影响）
+   3. 切换后多轮采样收敛，避免布局未完成时读到旧坐标
+   4. 导航入场动画只在首次加载播一次，之后不再重播 */
+(function () {
+  var nav = document.querySelector('.site-nav');
+  var wrap = document.querySelector('.site-links');
+  var ind = document.getElementById('navIndicator');
+  if (!nav || !wrap || !ind) return;
+
+  /* ---- 滚动阴影 ---- */
+  function onScroll() {
+    nav.classList.toggle('is-scrolled', window.scrollY > 8);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ---- 下划线定位 ---- */
+  function place() {
+    var cur = wrap.querySelector('.site-link[aria-current="page"]');
+    if (!cur) { ind.style.opacity = '0'; return; }
+    var cs = getComputedStyle(cur);
+    var pl = parseFloat(cs.paddingLeft) || 0;
+    var pr = parseFloat(cs.paddingRight) || 0;
+    ind.style.left = (cur.offsetLeft + pl) + 'px';
+    ind.style.width = Math.max(0, cur.offsetWidth - pl - pr) + 'px';
+    if (!ind.classList.contains('is-ready')) ind.classList.add('is-ready');
+    ind.style.opacity = '1';
+  }
+
+  /* 多轮采样：点击后 0 / 120 / 320 / 700ms 各校正一次，任一轮据实收敛 */
+  var timers = [];
+  function settle() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    requestAnimationFrame(place);
+    [120, 320, 700].forEach(function (d) {
+      timers.push(setTimeout(place, d));
+    });
+  }
+
+  window.addEventListener('hashchange', settle);
+  window.addEventListener('resize', settle);
+  if (window.MutationObserver) {
+    new MutationObserver(settle).observe(wrap, {
+      subtree: true, attributes: true, attributeFilter: ['aria-current']
+    });
+  }
+
+  /* ---- 首次就位 + 之后入场动画不再重播 ---- */
+  function init() {
+    place();                 /* 先定位，此时不允许过渡，不会从左侧飞入 */
+    setTimeout(function () {
+      ind.classList.add('is-ready');
+      nav.classList.add('nav-steady');   /* 入场动画到此为止，路由切换不再重播 */
+      place();
+    }, 450);
+  }
+  if (document.readyState === 'complete') init();
+  else window.addEventListener('load', init);
 })();
 </script>
 </body>
